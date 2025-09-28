@@ -123,6 +123,7 @@ class Product(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ProductCreate(BaseModel):
+    id: Optional[str] = None
     name: str
     description: Optional[str] = None
     part_number: str

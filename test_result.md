@@ -216,8 +216,7 @@ metadata:
 test_plan:
   current_focus:
     - "Product Page Supplier Offers"
-  stuck_tasks: 
-    - "Product Page Supplier Offers"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 

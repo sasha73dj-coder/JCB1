@@ -238,7 +238,11 @@ async def delete_supplier(supplier_id: str):
 # Product Routes
 @api_router.post("/products", response_model=Product)
 async def create_product(product_data: ProductCreate):
-    product = Product(**product_data.dict())
+    product_dict = product_data.dict()
+    if product_dict.get('id') is None:
+        product_dict['id'] = str(uuid.uuid4())
+    
+    product = Product(**product_dict)
     prepared_data = prepare_for_mongo(product.dict())
     result = await db.products.insert_one(prepared_data)
     return product

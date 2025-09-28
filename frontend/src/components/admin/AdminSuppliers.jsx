@@ -422,30 +422,97 @@ const AdminSuppliers = () => {
 };
 
 // Form component for adding/editing suppliers
-const SupplierForm = ({ supplier = null, onClose }) => {
+const SupplierForm = ({ supplier = null, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: supplier?.name || '',
-    code: supplier?.code || '',
-    apiUrl: supplier?.apiUrl || '',
-    apiKey: supplier?.apiKey || '',
-    deliveryDays: supplier?.deliveryDays || 1,
-    priceMarkup: supplier?.priceMarkup || 15,
-    priority: supplier?.priority || 1,
-    region: supplier?.region || '',
-    isOnlineOrdering: supplier?.isOnlineOrdering || true,
-    hasStatusSync: supplier?.hasStatusSync || true
+    description: supplier?.description || '',
+    status: supplier?.status || 'active',
+    rating: supplier?.rating || 5,
+    api_config: {
+      api_type: supplier?.api_config?.api_type || 'rest',  
+      base_url: supplier?.api_config?.base_url || '',
+      api_key: supplier?.api_config?.api_key || '',
+      additional_headers: supplier?.api_config?.additional_headers || {},
+      timeout: supplier?.api_config?.timeout || 30,
+      rate_limit: supplier?.api_config?.rate_limit || 100
+    },
+    pricing_config: {
+      markup_percentage: supplier?.pricing_config?.markup_percentage || 15,
+      min_markup_amount: supplier?.pricing_config?.min_markup_amount || 0,
+      currency: supplier?.pricing_config?.currency || 'RUB'
+    },
+    supported_brands: supplier?.supported_brands || [],
+    delivery_time_days: supplier?.delivery_time_days || 1
   });
   
+  const [loading, setLoading] = useState(false);
+  const [brandInput, setBrandInput] = useState('');
   const { toast } = useToast();
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock save
-    toast({
-      title: supplier ? 'Поставщик обновлен' : 'Поставщик добавлен',
-      description: 'Данные успешно сохранены'
-    });
-    onClose();
+    setLoading(true);
+    
+    try {
+      const url = supplier 
+        ? `${BACKEND_URL}/api/suppliers/${supplier.id}`
+        : `${BACKEND_URL}/api/suppliers`;
+      
+      const method = supplier ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        const savedSupplier = await response.json();
+        
+        toast({
+          title: supplier ? 'Поставщик обновлен' : 'Поставщик добавлен',
+          description: 'Данные успешно сохранены'
+        });
+        
+        if (onSave) {
+          onSave(savedSupplier);
+        }
+        
+        onClose();
+      } else {
+        const error = await response.json();
+        throw new Error(error.detail || 'Ошибка сохранения');
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addBrand = () => {
+    if (brandInput.trim() && !formData.supported_brands.includes(brandInput.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        supported_brands: [...prev.supported_brands, brandInput.trim()]
+      }));
+      setBrandInput('');
+    }
+  };
+
+  const removeBrand = (brandToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      supported_brands: prev.supported_brands.filter(brand => brand !== brandToRemove)
+    }));
   };
 
   return (

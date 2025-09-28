@@ -610,16 +610,59 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
         </TabsContent>
         
         <TabsContent value="api" className="space-y-4 mt-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="apiType" className="text-white">Тип API</Label>
+              <Select 
+                value={formData.api_config.api_type} 
+                onValueChange={(value) => setFormData(prev => ({
+                  ...prev, 
+                  api_config: {...prev.api_config, api_type: value}
+                }))}
+              >
+                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-700 border-gray-600">
+                  <SelectItem value="rest">REST API</SelectItem>
+                  <SelectItem value="soap">SOAP</SelectItem>
+                  <SelectItem value="xml">XML</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="timeout" className="text-white">Таймаут (сек)</Label>
+              <Input
+                id="timeout"
+                type="number"
+                min="5"
+                max="120"
+                value={formData.api_config.timeout}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  api_config: {...prev.api_config, timeout: parseInt(e.target.value)}
+                }))}
+                className="bg-gray-700 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="apiUrl" className="text-white">URL API</Label>
             <div className="relative">
               <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 id="apiUrl"
-                value={formData.apiUrl}
-                onChange={(e) => setFormData({...formData, apiUrl: e.target.value})}
+                value={formData.api_config.base_url}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  api_config: {...prev.api_config, base_url: e.target.value}
+                }))}
                 className="bg-gray-700 border-gray-600 text-white pl-10"
                 placeholder="https://api.supplier.com/v1"
+                required
               />
             </div>
           </div>
@@ -629,35 +672,31 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
             <Input
               id="apiKey"
               type="password"
-              value={formData.apiKey}
-              onChange={(e) => setFormData({...formData, apiKey: e.target.value})}
+              value={formData.api_config.api_key}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                api_config: {...prev.api_config, api_key: e.target.value}
+              }))}
               className="bg-gray-700 border-gray-600 text-white"
               placeholder="Введите API ключ"
+              required
             />
           </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-white font-medium">Онлайн заказы</Label>
-                <p className="text-gray-400 text-sm">Автоматическая отправка заказов через API</p>
-              </div>
-              <Switch
-                checked={formData.isOnlineOrdering}
-                onCheckedChange={(checked) => setFormData({...formData, isOnlineOrdering: checked})}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-white font-medium">Синхронизация статусов</Label>
-                <p className="text-gray-400 text-sm">Автоматическое обновление статусов заказов</p>
-              </div>
-              <Switch
-                checked={formData.hasStatusSync}
-                onCheckedChange={(checked) => setFormData({...formData, hasStatusSync: checked})}
-              />
-            </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="rateLimit" className="text-white">Лимит запросов в минуту</Label>
+            <Input
+              id="rateLimit"
+              type="number"
+              min="1"
+              value={formData.api_config.rate_limit || ''}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                api_config: {...prev.api_config, rate_limit: e.target.value ? parseInt(e.target.value) : null}
+              }))}
+              className="bg-gray-700 border-gray-600 text-white"
+              placeholder="Необязательно"
+            />
           </div>
         </TabsContent>
         

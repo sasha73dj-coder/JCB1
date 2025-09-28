@@ -131,22 +131,230 @@ class ProductCreate(BaseModel):
     base_price: Optional[float] = None
     image_url: Optional[str] = None
 
+# Helper functions
+def prepare_for_mongo(data):
+    """Convert datetime objects to ISO strings for MongoDB storage"""
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = value.isoformat()
+            elif isinstance(value, dict):
+                data[key] = prepare_for_mongo(value)
+            elif isinstance(value, list):
+                data[key] = [prepare_for_mongo(item) if isinstance(item, dict) else item for item in value]
+    return data
+
+def parse_from_mongo(item):
+    """Parse datetime strings back from MongoDB"""
+    if isinstance(item, dict):
+        for key, value in item.items():
+            if key in ['created_at', 'updated_at', 'timestamp', 'last_updated'] and isinstance(value, str):
+                try:
+                    item[key] = datetime.fromisoformat(value.replace('Z', '+00:00'))
+                except:
+                    pass
+            elif isinstance(value, dict):
+                item[key] = parse_from_mongo(value)
+            elif isinstance(value, list):
+                item[key] = [parse_from_mongo(subitem) if isinstance(subitem, dict) else subitem for subitem in value]
+    return item
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "NEXX E-Commerce API"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
     status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
+    prepared_data = prepare_for_mongo(status_obj.dict())
+    _ = await db.status_checks.insert_one(prepared_data)
     return status_obj
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+    return [StatusCheck(**parse_from_mongo(status_check)) for status_check in status_checks]
+
+# Supplier Management Routes
+@api_router.post("/suppliers", response_model=Supplier)
+async def create_supplier(supplier_data: SupplierCreate):
+    supplier = Supplier(**supplier_data.dict())
+    prepared_data = prepare_for_mongo(supplier.dict())
+    result = await db.suppliers.insert_one(prepared_data)
+    return supplier
+
+@api_router.get("/suppliers", response_model=List[Supplier])
+async def get_suppliers(
+    status: Optional[SupplierStatus] = None,
+    brand: Optional[str] = None
+):
+    query = {}
+    if status:
+        query["status"] = status.value
+    if brand:
+        query["supported_brands"] = {"$in": [brand]}
+    
+    suppliers = await db.suppliers.find(query).to_list(1000)
+    return [Supplier(**parse_from_mongo(supplier)) for supplier in suppliers]
+
+@api_router.get("/suppliers/{supplier_id}", response_model=Supplier)
+async def get_supplier(supplier_id: str):
+    supplier = await db.suppliers.find_one({"id": supplier_id})
+    if not supplier:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    return Supplier(**parse_from_mongo(supplier))
+
+@api_router.put("/suppliers/{supplier_id}", response_model=Supplier)
+async def update_supplier(supplier_id: str, supplier_update: SupplierUpdate):
+    # Get existing supplier
+    existing_supplier = await db.suppliers.find_one({"id": supplier_id})
+    if not existing_supplier:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    
+    # Update only provided fields
+    update_data = supplier_update.dict(exclude_unset=True)
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    
+    prepared_update = prepare_for_mongo(update_data)
+    await db.suppliers.update_one({"id": supplier_id}, {"$set": prepared_update})
+    
+    # Return updated supplier
+    updated_supplier = await db.suppliers.find_one({"id": supplier_id})
+    return Supplier(**parse_from_mongo(updated_supplier))
+
+@api_router.delete("/suppliers/{supplier_id}")
+async def delete_supplier(supplier_id: str):
+    result = await db.suppliers.delete_one({"id": supplier_id})
+    if result.deleted_count == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    return {"message": "Supplier deleted successfully"}
+
+# Product Routes
+@api_router.post("/products", response_model=Product)
+async def create_product(product_data: ProductCreate):
+    product = Product(**product_data.dict())
+    prepared_data = prepare_for_mongo(product.dict())
+    result = await db.products.insert_one(prepared_data)
+    return product
+
+@api_router.get("/products", response_model=List[Product])
+async def get_products(
+    brand: Optional[str] = None,
+    category: Optional[str] = None,
+    part_number: Optional[str] = None
+):
+    query = {}
+    if brand:
+        query["brand"] = {"$regex": brand, "$options": "i"}
+    if category:
+        query["category"] = {"$regex": category, "$options": "i"}
+    if part_number:
+        query["part_number"] = {"$regex": part_number, "$options": "i"}
+    
+    products = await db.products.find(query).to_list(1000)
+    return [Product(**parse_from_mongo(product)) for product in products]
+
+@api_router.get("/products/{product_id}", response_model=Product)
+async def get_product(product_id: str):
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Product not found")
+    return Product(**parse_from_mongo(product))
+
+# Product Offers from Suppliers
+@api_router.get("/products/{product_id}/offers", response_model=List[ProductOffer])
+async def get_product_offers(product_id: str):
+    """Get all supplier offers for a specific product"""
+    # First check if product exists
+    product = await db.products.find_one({"id": product_id})
+    if not product:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Get offers from all active suppliers
+    offers = []
+    active_suppliers = await db.suppliers.find({"status": "active"}).to_list(1000)
+    
+    for supplier_data in active_suppliers:
+        supplier = Supplier(**parse_from_mongo(supplier_data))
+        
+        # Mock supplier API call - in real implementation, this would call actual supplier APIs
+        offer = await mock_supplier_api_call(supplier, product_id, Product(**parse_from_mongo(product)))
+        if offer:
+            offers.append(offer)
+    
+    return offers
+
+async def mock_supplier_api_call(supplier: Supplier, product_id: str, product: Product) -> Optional[ProductOffer]:
+    """Mock supplier API call - replace with actual API integration"""
+    import random
+    
+    # Mock stock availability (70% chance of having stock)
+    if random.random() < 0.3:
+        return None
+    
+    # Mock wholesale price calculation
+    base_price = product.base_price or random.uniform(10000, 200000)
+    wholesale_price = base_price * random.uniform(0.7, 0.9)  # 70-90% of base price
+    
+    # Calculate client price with markup
+    markup_percentage = supplier.pricing_config.markup_percentage
+    min_markup = supplier.pricing_config.min_markup_amount or 0
+    
+    markup_amount = max(wholesale_price * (markup_percentage / 100), min_markup)
+    client_price = wholesale_price + markup_amount
+    
+    return ProductOffer(
+        supplier_id=supplier.id,
+        supplier_name=supplier.name,
+        product_id=product_id,
+        part_number=product.part_number,
+        wholesale_price=round(wholesale_price, 2),
+        client_price=round(client_price, 2),
+        currency=supplier.pricing_config.currency,
+        stock_quantity=random.randint(1, 50),
+        delivery_time_days=supplier.delivery_time_days + random.randint(0, 3),
+        supplier_rating=supplier.rating,
+        last_updated=datetime.now(timezone.utc)
+    )
+
+# Test supplier API connection
+@api_router.post("/suppliers/{supplier_id}/test-connection")
+async def test_supplier_connection(supplier_id: str):
+    """Test connection to supplier API"""
+    supplier = await db.suppliers.find_one({"id": supplier_id})
+    if not supplier:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    
+    supplier_obj = Supplier(**parse_from_mongo(supplier))
+    
+    # Mock API test - in real implementation, make actual API call
+    import random
+    import asyncio
+    
+    # Simulate API call delay
+    await asyncio.sleep(1)
+    
+    # Mock success/failure (90% success rate)
+    if random.random() < 0.9:
+        return {
+            "status": "success",
+            "message": "Connection successful",
+            "response_time_ms": random.randint(100, 500)
+        }
+    else:
+        return {
+            "status": "error",
+            "message": "Connection failed: Invalid API key or network error",
+            "response_time_ms": 5000
+        }
 
 # Include the router in the main app
 app.include_router(api_router)

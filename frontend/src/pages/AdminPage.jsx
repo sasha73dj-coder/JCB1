@@ -7,6 +7,8 @@ import AdminProducts from '../components/admin/AdminProducts';
 import AdminOrders from '../components/admin/AdminOrders';
 import AdminUsers from '../components/admin/AdminUsers';
 import AdminSettings from '../components/admin/AdminSettings';
+import AdminSuppliers from '../components/admin/AdminSuppliers';
+import AdminSupplierIntegration from '../components/admin/AdminSupplierIntegration';
 import { Shield } from 'lucide-react';
 
 const AdminPage = () => {

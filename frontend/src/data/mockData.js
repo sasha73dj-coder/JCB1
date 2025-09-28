@@ -171,7 +171,7 @@ export const products = [
     tags: ["новинка", "рекомендуем"]
   },
   {
-    id: 5,
+    id: "550e8400-e29b-41d4-a716-446655440005",
     name: "Двигатель в сборе SD 68KW 444 TC 12V 320/41947 JCB АНГЛИЯ",
     slug: "dvigatel-v-sbore-sd-68kw-444-tc",
     sku: "320/41947",

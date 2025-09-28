@@ -17,7 +17,7 @@ import {
   Truck, 
   CheckCircle,
   XCircle,
-  Sync,
+  RotateCw,
   Eye,
   Edit,
   Trash2,

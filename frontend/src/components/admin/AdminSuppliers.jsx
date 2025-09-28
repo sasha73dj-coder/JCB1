@@ -240,9 +240,9 @@ const AdminSuppliers = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Всего товаров</p>
+                <p className="text-gray-400 text-sm">Всего брендов</p>
                 <p className="text-2xl font-bold text-white">
-                  {suppliers.reduce((total, s) => total + s.stockCount, 0).toLocaleString()}
+                  {suppliers.reduce((total, s) => total + (s.supported_brands?.length || 0), 0)}
                 </p>
               </div>
               <Truck className="h-8 w-8 text-orange-400" />
@@ -256,7 +256,7 @@ const AdminSuppliers = () => {
               <div>
                 <p className="text-gray-400 text-sm">Средний срок</p>
                 <p className="text-2xl font-bold text-white">
-                  {Math.round(suppliers.reduce((total, s) => total + s.deliveryDays, 0) / suppliers.length)} дня
+                  {suppliers.length > 0 ? Math.round(suppliers.reduce((total, s) => total + s.delivery_time_days, 0) / suppliers.length) : 0} дня
                 </p>
               </div>
               <Clock className="h-8 w-8 text-purple-400" />

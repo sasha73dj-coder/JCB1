@@ -56,7 +56,7 @@ export const categories = [
 
 export const products = [
   {
-    id: 1,
+    id: "550e8400-e29b-41d4-a716-446655440001",
     name: "ТНВД 320/06924 320/06738 320/06929 9323A261G ИНДИЯ JCB",
     slug: "tnvd-320-06924-jcb",
     sku: "320/06924",

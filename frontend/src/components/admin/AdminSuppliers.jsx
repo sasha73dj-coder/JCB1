@@ -537,26 +537,75 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="code" className="text-white">Код поставщика</Label>
-              <Input
-                id="code"
-                value={formData.code}
-                onChange={(e) => setFormData({...formData, code: e.target.value})}
-                className="bg-gray-700 border-gray-600 text-white"
-                required
-              />
+              <Label htmlFor="status" className="text-white">Статус</Label>
+              <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-700 border-gray-600">
+                  <SelectItem value="active">Активен</SelectItem>
+                  <SelectItem value="inactive">Неактивен</SelectItem>
+                  <SelectItem value="testing">Тестирование</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="region" className="text-white">Регион</Label>
+            <Label htmlFor="description" className="text-white">Описание</Label>
             <Input
-              id="region"
-              value={formData.region}
-              onChange={(e) => setFormData({...formData, region: e.target.value})}
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
               className="bg-gray-700 border-gray-600 text-white"
-              placeholder="Москва, Санкт-Петербург..."
+              placeholder="Краткое описание поставщика..."
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="rating" className="text-white">Рейтинг (1-5)</Label>
+            <Input
+              id="rating"
+              type="number"
+              min="1"
+              max="5"
+              step="0.1"
+              value={formData.rating}
+              onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value)})}
+              className="bg-gray-700 border-gray-600 text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-white">Поддерживаемые бренды</Label>
+            <div className="flex space-x-2">
+              <Input
+                value={brandInput}
+                onChange={(e) => setBrandInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBrand())}
+                className="bg-gray-700 border-gray-600 text-white flex-1"
+                placeholder="Введите бренд и нажмите Enter"
+              />
+              <Button type="button" onClick={addBrand} variant="outline" className="border-gray-600 text-gray-300">
+                Добавить
+              </Button>
+            </div>
+            {formData.supported_brands.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.supported_brands.map((brand, index) => (
+                  <Badge key={index} className="bg-blue-500/20 text-blue-400 flex items-center space-x-1">
+                    <span>{brand}</span>
+                    <button 
+                      type="button" 
+                      onClick={() => removeBrand(brand)}
+                      className="text-blue-400 hover:text-blue-300 ml-1"
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </TabsContent>
         

@@ -708,8 +708,8 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
                 id="deliveryDays"
                 type="number"
                 min="1"
-                value={formData.deliveryDays}
-                onChange={(e) => setFormData({...formData, deliveryDays: parseInt(e.target.value)})}
+                value={formData.delivery_time_days}
+                onChange={(e) => setFormData({...formData, delivery_time_days: parseInt(e.target.value)})}
                 className="bg-gray-700 border-gray-600 text-white"
               />
             </div>
@@ -721,25 +721,51 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
                 type="number"
                 min="0"
                 step="0.1"
-                value={formData.priceMarkup}
-                onChange={(e) => setFormData({...formData, priceMarkup: parseFloat(e.target.value)})}
+                value={formData.pricing_config.markup_percentage}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  pricing_config: {...prev.pricing_config, markup_percentage: parseFloat(e.target.value)}
+                }))}
                 className="bg-gray-700 border-gray-600 text-white"
               />
             </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="priority" className="text-white">Приоритет (1-10)</Label>
-            <Input
-              id="priority"
-              type="number"
-              min="1"
-              max="10"
-              value={formData.priority}
-              onChange={(e) => setFormData({...formData, priority: parseInt(e.target.value)})}
-              className="bg-gray-700 border-gray-600 text-white"
-            />
-            <p className="text-gray-400 text-xs">1 - высший приоритет, 10 - низший</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="minMarkup" className="text-white">Минимальная наценка (₽)</Label>
+              <Input
+                id="minMarkup"
+                type="number"
+                min="0"
+                value={formData.pricing_config.min_markup_amount}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  pricing_config: {...prev.pricing_config, min_markup_amount: parseFloat(e.target.value)}
+                }))}
+                className="bg-gray-700 border-gray-600 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="currency" className="text-white">Валюта</Label>
+              <Select 
+                value={formData.pricing_config.currency} 
+                onValueChange={(value) => setFormData(prev => ({
+                  ...prev,
+                  pricing_config: {...prev.pricing_config, currency: value}
+                }))}
+              >
+                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-700 border-gray-600">
+                  <SelectItem value="RUB">RUB (₽)</SelectItem>
+                  <SelectItem value="USD">USD ($)</SelectItem>
+                  <SelectItem value="EUR">EUR (€)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

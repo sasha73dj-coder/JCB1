@@ -82,40 +82,106 @@ const AdminSuppliers = () => {
         return 'bg-green-500/20 text-green-400';
       case 'inactive':
         return 'bg-red-500/20 text-red-400';
-      case 'syncing':
+      case 'testing':
         return 'bg-yellow-500/20 text-yellow-400';
       default:
         return 'bg-gray-500/20 text-gray-400';
     }
   };
 
-  const syncSupplier = (supplierId) => {
-    setSuppliers(prev => prev.map(s => 
-      s.id === supplierId 
-        ? { ...s, status: 'syncing', lastSync: new Date().toLocaleString('ru-RU') }
-        : s
-    ));
-    
-    setTimeout(() => {
-      setSuppliers(prev => prev.map(s => 
-        s.id === supplierId 
-          ? { ...s, status: 'active', stockCount: s.stockCount + Math.floor(Math.random() * 100) }
-          : s
-      ));
+  const testSupplierConnection = async (supplierId) => {
+    try {
+      setTestingConnections(prev => ({ ...prev, [supplierId]: true }));
       
-      toast({
-        title: 'Синхронизация завершена',
-        description: 'Данные поставщика успешно обновлены'
+      const response = await fetch(`${BACKEND_URL}/api/suppliers/${supplierId}/test-connection`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
-    }, 3000);
+      
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        toast({
+          title: 'Тест подключения успешен',
+          description: `Время ответа: ${result.response_time_ms}ms`
+        });
+      } else {
+        toast({
+          title: 'Ошибка подключения',
+          description: result.message,
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка теста',
+        description: 'Не удалось протестировать подключение',
+        variant: 'destructive'
+      });
+    } finally {
+      setTestingConnections(prev => ({ ...prev, [supplierId]: false }));
+    }
   };
 
-  const toggleSupplierStatus = (supplierId) => {
-    setSuppliers(prev => prev.map(s => 
-      s.id === supplierId 
-        ? { ...s, status: s.status === 'active' ? 'inactive' : 'active' }
-        : s
-    ));
+  const toggleSupplierStatus = async (supplierId) => {
+    try {
+      const supplier = suppliers.find(s => s.id === supplierId);
+      const newStatus = supplier.status === 'active' ? 'inactive' : 'active';
+      
+      const response = await fetch(`${BACKEND_URL}/api/suppliers/${supplierId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      
+      if (response.ok) {
+        const updatedSupplier = await response.json();
+        setSuppliers(prev => prev.map(s => 
+          s.id === supplierId ? updatedSupplier : s
+        ));
+        
+        toast({
+          title: 'Статус обновлен',
+          description: `Поставщик ${newStatus === 'active' ? 'активирован' : 'деактивирован'}`
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось обновить статус поставщика',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const deleteSupplier = async (supplierId) => {
+    if (!window.confirm('Вы уверены, что хотите удалить этого поставщика?')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/suppliers/${supplierId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setSuppliers(prev => prev.filter(s => s.id !== supplierId));
+        toast({
+          title: 'Поставщик удален',
+          description: 'Поставщик успешно удален из системы'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить поставщика',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (

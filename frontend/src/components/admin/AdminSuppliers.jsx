@@ -777,8 +777,18 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
         <Button 
           type="submit" 
           className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+          disabled={loading}
         >
-          {supplier ? 'Обновить' : 'Добавить'} поставщика
+          {loading ? (
+            <>
+              <Sync className="h-4 w-4 animate-spin mr-2" />
+              Сохранение...
+            </>
+          ) : (
+            <>
+              {supplier ? 'Обновить' : 'Добавить'} поставщика
+            </>
+          )}
         </Button>
       </div>
     </form>

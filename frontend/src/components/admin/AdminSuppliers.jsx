@@ -203,7 +203,13 @@ const AdminSuppliers = () => {
             <DialogHeader>
               <DialogTitle className="text-white">Добавление нового поставщика</DialogTitle>
             </DialogHeader>
-            <SupplierForm onClose={() => setIsAddingSupplier(false)} />
+            <SupplierForm 
+              onClose={() => setIsAddingSupplier(false)} 
+              onSave={(newSupplier) => {
+                setSuppliers(prev => [...prev, newSupplier]);
+                setIsAddingSupplier(false);
+              }}
+            />
           </DialogContent>
         </Dialog>
       </div>

@@ -35,6 +35,18 @@ const AdminSidebar = ({ currentView, onViewChange }) => {
       badge: '23'
     },
     {
+      id: 'suppliers',
+      name: 'Поставщики',
+      icon: <Palette className="h-5 w-5" />,
+      badge: '3'
+    },
+    {
+      id: 'api-integration',
+      name: 'API интеграция',
+      icon: <BarChart3 className="h-5 w-5" />,
+      badge: null
+    },
+    {
       id: 'users',
       name: 'Пользователи',
       icon: <Users className="h-5 w-5" />,
@@ -43,25 +55,13 @@ const AdminSidebar = ({ currentView, onViewChange }) => {
     {
       id: 'analytics',
       name: 'Аналитика',
-      icon: <BarChart3 className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5" />,
       badge: null
     },
     {
       id: 'content',
       name: 'Контент',
-      icon: <FileText className="h-5 w-5" />,
-      badge: null
-    },
-    {
-      id: 'media',
-      name: 'Медиа',
       icon: <Image className="h-5 w-5" />,
-      badge: null
-    },
-    {
-      id: 'design',
-      name: 'Дизайн',
-      icon: <Palette className="h-5 w-5" />,
       badge: null
     },
     {

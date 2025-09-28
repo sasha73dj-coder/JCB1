@@ -302,84 +302,116 @@ const AdminSuppliers = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredSuppliers.map((supplier) => (
-                  <tr key={supplier.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
-                          {supplier.code}
-                        </div>
-                        <div>
-                          <div className="text-white font-medium">{supplier.name}</div>
-                          <div className="text-gray-400 text-sm flex items-center">
-                            <Globe className="h-3 w-3 mr-1" />
-                            {supplier.region}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-1">
-                            {supplier.isOnlineOrdering && (
-                              <Badge className="bg-green-500/20 text-green-400 text-xs">Онлайн заказ</Badge>
-                            )}
-                            {supplier.hasStatusSync && (
-                              <Badge className="bg-blue-500/20 text-blue-400 text-xs">Статусы</Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getStatusColor(supplier.status)}>
-                          {supplier.status === 'active' ? 'Активен' : 
-                           supplier.status === 'syncing' ? 'Синхронизация' : 'Неактивен'}
-                        </Badge>
-                        <Switch
-                          checked={supplier.status === 'active'}
-                          onCheckedChange={() => toggleSupplierStatus(supplier.id)}
-                          className="scale-75"
-                        />
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="text-white font-semibold">
-                        {supplier.stockCount.toLocaleString()}
-                      </div>
-                      <div className="text-gray-400 text-xs">
-                        Рейтинг: {supplier.rating}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center space-x-1 text-white">
-                        <Clock className="h-4 w-4 text-gray-400" />
-                        <span>{supplier.deliveryDays} {supplier.deliveryDays === 1 ? 'день' : supplier.deliveryDays < 5 ? 'дня' : 'дней'}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="text-white font-medium">+{supplier.priceMarkup}%</span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="text-gray-300 text-sm">{supplier.lastSync}</div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-blue-400 hover:text-blue-300"
-                          onClick={() => syncSupplier(supplier.id)}
-                          disabled={supplier.status === 'syncing'}
-                        >
-                          <Sync className={`h-4 w-4 ${supplier.status === 'syncing' ? 'animate-spin' : ''}`} />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 px-4 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <Sync className="h-5 w-5 animate-spin text-orange-400" />
+                        <span className="text-gray-400">Загрузка поставщиков...</span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                ) : filteredSuppliers.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 px-4 text-center text-gray-400">
+                      Поставщики не найдены
+                    </td>
+                  </tr>
+                ) : (
+                  filteredSuppliers.map((supplier) => (
+                    <tr key={supplier.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
+                            {supplier.name.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">{supplier.name}</div>
+                            <div className="text-gray-400 text-sm flex items-center">
+                              <Globe className="h-3 w-3 mr-1" />
+                              {supplier.api_config?.base_url?.split('/')[2] || 'API'}
+                            </div>
+                            <div className="flex items-center space-x-2 mt-1">
+                              {supplier.supported_brands?.length > 0 && (
+                                <Badge className="bg-green-500/20 text-green-400 text-xs">
+                                  {supplier.supported_brands.length} брендов
+                                </Badge>
+                              )}
+                              <Badge className="bg-blue-500/20 text-blue-400 text-xs">
+                                {supplier.api_config?.api_type || 'REST'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center space-x-2">
+                          <Badge className={getStatusColor(supplier.status)}>
+                            {supplier.status === 'active' ? 'Активен' : 
+                             supplier.status === 'testing' ? 'Тестирование' : 'Неактивен'}
+                          </Badge>
+                          <Switch
+                            checked={supplier.status === 'active'}
+                            onCheckedChange={() => toggleSupplierStatus(supplier.id)}
+                            className="scale-75"
+                          />
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-white font-semibold flex items-center">
+                          <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                          {supplier.rating.toFixed(1)}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          Наценка: {supplier.pricing_config?.markup_percentage || 0}%
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center space-x-1 text-white">
+                          <Clock className="h-4 w-4 text-gray-400" />
+                          <span>{supplier.delivery_time_days} {supplier.delivery_time_days === 1 ? 'день' : supplier.delivery_time_days < 5 ? 'дня' : 'дней'}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-white font-medium">+{supplier.pricing_config?.markup_percentage || 0}%</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-gray-300 text-sm">
+                          {supplier.updated_at ? new Date(supplier.updated_at).toLocaleString('ru-RU') : '-'}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-blue-400 hover:text-blue-300"
+                            onClick={() => testSupplierConnection(supplier.id)}
+                            disabled={testingConnections[supplier.id]}
+                          >
+                            <TestTube className={`h-4 w-4 ${testingConnections[supplier.id] ? 'animate-pulse' : ''}`} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-yellow-400 hover:text-yellow-300"
+                            onClick={() => setSelectedSupplier(supplier)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-400 hover:text-red-300"
+                            onClick={() => deleteSupplier(supplier.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

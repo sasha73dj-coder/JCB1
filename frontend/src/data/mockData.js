@@ -143,7 +143,7 @@ export const products = [
     tags: ["новинка"]
   },
   {
-    id: 4,
+    id: "550e8400-e29b-41d4-a716-446655440004",
     name: "Подшипник ступичного вала 917/50200 NK45/30 TIMKEN",
     slug: "podshipnik-stupichnogo-vala-917-50200",
     sku: "917/50200",

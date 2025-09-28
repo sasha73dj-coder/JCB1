@@ -171,18 +171,24 @@ frontend:
         - working: true
           agent: "main"
           comment: "✅ Complete admin interface for managing suppliers with real-time API integration, test connections, add/edit/delete functionality, and comprehensive forms"
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED: Admin suppliers interface fully functional. Verified: Statistics cards display (2 suppliers, 2 active, 5 brands, 2 days avg delivery), search functionality, suppliers table with real data (Запчасти JCB Москва, ТракторСнаб СПб), add supplier modal with 3-tab form (Basic/API/Settings), all form fields accept input, dropdown selectors work, brand addition, status toggles, API connection testing, edit functionality, mobile responsiveness. Russian localization perfect throughout."
 
   - task: "Product Page Supplier Offers"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/pages/ProductPage.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "✅ Added supplier offers section to product pages showing pricing comparison, stock levels, delivery times, and supplier ratings with best offer highlighting"
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE: Product offers API failing with 404 errors. Frontend correctly displays 'Предложения поставщиков не найдены' message, but backend API endpoint /api/products/{id}/offers returns 404 for product IDs from mock data (e.g., product ID '2'). Issue: Frontend uses integer IDs from mockData.js but backend expects UUID format. API integration works but data mismatch prevents offers display."
 
   - task: "Supplier API Integration Component"
     implemented: true
@@ -195,6 +201,9 @@ frontend:
         - working: true
           agent: "main"
           comment: "✅ API integration interface with webhook configuration, settings management, and API testing capabilities"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED SUCCESSFULLY: API integration component accessible through admin panel. Connection testing functionality works correctly, returns proper mock responses with status and response time. Integration with supplier management interface seamless."
 
 metadata:
   created_by: "testing_agent"

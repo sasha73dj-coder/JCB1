@@ -808,7 +808,7 @@ const SupplierForm = ({ supplier = null, onClose, onSave }) => {
         >
           {loading ? (
             <>
-              <Sync className="h-4 w-4 animate-spin mr-2" />
+              <RotateCw className="h-4 w-4 animate-spin mr-2" />
               Сохранение...
             </>
           ) : (

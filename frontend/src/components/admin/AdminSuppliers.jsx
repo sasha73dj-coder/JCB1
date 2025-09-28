@@ -31,65 +31,12 @@ const AdminSuppliers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddingSupplier, setIsAddingSupplier] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [suppliers, setSuppliers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [testingConnections, setTestingConnections] = useState({});
   const { toast } = useToast();
-  
-  // Mock suppliers data
-  const [suppliers, setSuppliers] = useState([
-    {
-      id: 1,
-      name: 'АвтоЗапчасти Москва',
-      code: 'AZM',
-      status: 'active',
-      apiUrl: 'https://api.azm.ru/v2',
-      apiKey: 'azm_key_****',
-      lastSync: '2024-12-20 16:30',
-      deliveryDays: 1,
-      stockCount: 12540,
-      priceMarkup: 15,
-      priority: 1,
-      isOnlineOrdering: true,
-      hasStatusSync: true,
-      region: 'Москва',
-      rating: 4.8,
-      ordersCount: 1250
-    },
-    {
-      id: 2,
-      name: 'ЗапчастиПро СПб',
-      code: 'ZPS',
-      status: 'active',
-      apiUrl: 'https://zapchastipro.spb.ru/api',
-      apiKey: 'zps_key_****',
-      lastSync: '2024-12-20 16:25',
-      deliveryDays: 2,
-      stockCount: 8920,
-      priceMarkup: 12,
-      priority: 2,
-      isOnlineOrdering: true,
-      hasStatusSync: false,
-      region: 'Санкт-Петербург',
-      rating: 4.6,
-      ordersCount: 890
-    },
-    {
-      id: 3,
-      name: 'ТракторЗапчасти',
-      code: 'TZ',
-      status: 'inactive',
-      apiUrl: 'https://traktorzapchasti.ru/api/v1',
-      apiKey: 'tz_key_****',
-      lastSync: '2024-12-19 10:15',
-      deliveryDays: 3,
-      stockCount: 0,
-      priceMarkup: 20,
-      priority: 3,
-      isOnlineOrdering: false,
-      hasStatusSync: true,
-      region: 'Екатеринбург',
-      rating: 4.2,
-      ordersCount: 320
-    }
-  ]);
+
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
   const filteredSuppliers = suppliers.filter(supplier => 
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

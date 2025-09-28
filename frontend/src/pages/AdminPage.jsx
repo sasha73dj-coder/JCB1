@@ -24,6 +24,10 @@ const AdminPage = () => {
         return <AdminProducts />;
       case 'orders':
         return <AdminOrders />;
+      case 'suppliers':
+        return <AdminSuppliers />;
+      case 'api-integration':
+        return <AdminSupplierIntegration />;
       case 'users':
         return <AdminUsers />;
       case 'settings':

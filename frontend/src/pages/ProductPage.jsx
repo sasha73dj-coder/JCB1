@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import Breadcrumbs from '../components/common/Breadcrumbs';
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, Clock } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, Clock, Package, Zap, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Card, CardContent } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { products, reviews } from '../data/mockData';
 

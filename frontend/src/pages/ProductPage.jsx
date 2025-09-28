@@ -19,6 +19,32 @@ const ProductPage = () => {
   const product = products.find(p => p.slug === slug);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
+  // Load supplier offers
+  useEffect(() => {
+    if (product?.id) {
+      fetchSupplierOffers(product.id);
+    }
+  }, [product?.id]);
+
+  const fetchSupplierOffers = async (productId) => {
+    try {
+      setLoadingOffers(true);
+      const response = await fetch(`${BACKEND_URL}/api/products/${productId}/offers`);
+      if (response.ok) {
+        const offers = await response.json();
+        setSupplierOffers(offers);
+      } else {
+        console.log('No offers found or error fetching offers');
+        setSupplierOffers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching supplier offers:', error);
+      setSupplierOffers([]);
+    } finally {
+      setLoadingOffers(false);
+    }
+  };
+
   if (!product) {
     return (
       <Layout>

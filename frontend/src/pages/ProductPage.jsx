@@ -262,6 +262,126 @@ const ProductPage = () => {
             </div>
           </div>
 
+          {/* Supplier Offers Section */}
+          <div className="mt-12">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Package className="h-5 w-5 mr-2 text-orange-500" />
+                  Предложения поставщиков
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingOffers ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-5 w-5 animate-pulse text-orange-400" />
+                      <span className="text-gray-400">Загрузка предложений поставщиков...</span>
+                    </div>
+                  </div>
+                ) : supplierOffers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Package className="h-12 w-12 text-gray-600 mx-auto mb-2" />
+                    <p className="text-gray-400">Предложения поставщиков не найдены</p>
+                    <p className="text-gray-500 text-sm">Товар может быть добавлен по запросу</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-sm text-gray-400 mb-4">
+                      Найдено {supplierOffers.length} предложений от поставщиков
+                    </div>
+                    
+                    <div className="grid gap-4">
+                      {supplierOffers.map((offer) => (
+                        <Card key={offer.id} className="bg-gray-700 border-gray-600">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-3 mb-2">
+                                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-semibold text-xs">
+                                    {offer.supplier_name.substring(0, 2).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <h4 className="text-white font-semibold">{offer.supplier_name}</h4>
+                                    <div className="flex items-center space-x-2 text-xs">
+                                      <div className="flex items-center">
+                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
+                                        <span className="text-gray-300">{offer.supplier_rating.toFixed(1)}</span>
+                                      </div>
+                                      <span className="text-gray-500">•</span>
+                                      <span className="text-gray-400">Артикул: {offer.part_number}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                  <div>
+                                    <div className="text-xs text-gray-400">Цена для вас</div>
+                                    <div className="text-white font-bold text-lg">
+                                      {formatPrice(offer.client_price)} ₽
+                                    </div>
+                                  </div>
+                                  
+                                  <div>
+                                    <div className="text-xs text-gray-400">В наличии</div>
+                                    <div className="text-green-400 font-semibold">
+                                      {offer.stock_quantity} шт
+                                    </div>
+                                  </div>
+                                  
+                                  <div>
+                                    <div className="text-xs text-gray-400">Доставка</div>
+                                    <div className="text-white font-semibold">
+                                      {offer.delivery_time_days === 0 ? 'Сегодня' : 
+                                       offer.delivery_time_days === 1 ? '1 день' : 
+                                       `${offer.delivery_time_days} дня`}
+                                    </div>
+                                  </div>
+                                  
+                                  <div>
+                                    <div className="text-xs text-gray-400">Обновлено</div>
+                                    <div className="text-gray-300 text-sm">
+                                      {new Date(offer.last_updated).toLocaleDateString('ru-RU')}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="ml-4">
+                                <Button 
+                                  size="sm" 
+                                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                                >
+                                  <ShoppingCart className="h-4 w-4 mr-2" />
+                                  В корзину
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    
+                    {/* Best offer highlight */}
+                    {supplierOffers.length > 1 && (
+                      <div className="mt-6 p-4 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-lg">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <TrendingUp className="h-5 w-5 text-green-400" />
+                          <span className="text-green-400 font-semibold">Лучшее предложение</span>
+                        </div>
+                        <p className="text-gray-300 text-sm">
+                          Самая низкая цена: <span className="text-white font-bold">
+                            {formatPrice(Math.min(...supplierOffers.map(o => o.client_price)))} ₽
+                          </span> от поставщика {supplierOffers.find(o => o.client_price === Math.min(...supplierOffers.map(s => s.client_price)))?.supplier_name}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Product Details Tabs */}
           <div className="mt-12">
             <Tabs defaultValue="description" className="w-full">

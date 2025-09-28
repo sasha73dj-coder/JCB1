@@ -333,7 +333,7 @@ const AdminSuppliers = () => {
                   <tr>
                     <td colSpan="7" className="py-8 px-4 text-center">
                       <div className="flex items-center justify-center space-x-2">
-                        <Sync className="h-5 w-5 animate-spin text-orange-400" />
+                        <RotateCw className="h-5 w-5 animate-spin text-orange-400" />
                         <span className="text-gray-400">Загрузка поставщиков...</span>
                       </div>
                     </td>

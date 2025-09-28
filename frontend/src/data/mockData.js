@@ -203,7 +203,7 @@ export const products = [
     tags: ["хит", "премиум"]
   },
   {
-    id: 6,
+    id: "550e8400-e29b-41d4-a716-446655440006",
     name: "Фильтр масляный 02/100284 JCB",
     slug: "filtr-maslyanyj-02-100284-jcb",
     sku: "02/100284", 

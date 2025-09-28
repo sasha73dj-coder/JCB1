@@ -212,6 +212,27 @@ const AdminSuppliers = () => {
             />
           </DialogContent>
         </Dialog>
+        
+        {/* Edit Supplier Dialog */}
+        <Dialog open={!!selectedSupplier} onOpenChange={() => setSelectedSupplier(null)}>
+          <DialogContent className="bg-gray-800 border-gray-700 max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-white">Редактирование поставщика</DialogTitle>
+            </DialogHeader>
+            {selectedSupplier && (
+              <SupplierForm 
+                supplier={selectedSupplier}
+                onClose={() => setSelectedSupplier(null)} 
+                onSave={(updatedSupplier) => {
+                  setSuppliers(prev => prev.map(s => 
+                    s.id === updatedSupplier.id ? updatedSupplier : s
+                  ));
+                  setSelectedSupplier(null);
+                }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Stats */}

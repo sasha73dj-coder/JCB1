@@ -212,10 +212,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Supplier Management API"
-    - "Admin Suppliers Management Interface"
     - "Product Page Supplier Offers"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "Product Page Supplier Offers"
   test_all: false
   test_priority: "high_first"
 

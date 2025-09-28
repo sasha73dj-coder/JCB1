@@ -38,10 +38,42 @@ const AdminSuppliers = () => {
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
+  // Load suppliers on component mount
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
+
+  const fetchSuppliers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/suppliers`);
+      if (response.ok) {
+        const data = await response.json();
+        setSuppliers(data);
+      } else {
+        toast({
+          title: 'Ошибка загрузки',
+          description: 'Не удалось загрузить список поставщиков',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching suppliers:', error);
+      toast({
+        title: 'Ошибка сети',
+        description: 'Проверьте подключение к интернету',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredSuppliers = suppliers.filter(supplier => 
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.region.toLowerCase().includes(searchTerm.toLowerCase())
+    (supplier.supported_brands && supplier.supported_brands.some(brand => 
+      brand.toLowerCase().includes(searchTerm.toLowerCase())
+    ))
   );
 
   const getStatusColor = (status) => {

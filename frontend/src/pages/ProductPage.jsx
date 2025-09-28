@@ -13,8 +13,11 @@ const ProductPage = () => {
   const { slug } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [supplierOffers, setSupplierOffers] = useState([]);
+  const [loadingOffers, setLoadingOffers] = useState(true);
   
   const product = products.find(p => p.slug === slug);
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
   if (!product) {
     return (

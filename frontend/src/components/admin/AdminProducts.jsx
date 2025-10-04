@@ -340,8 +340,8 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
       // Prepare data
       const productData = {
         ...formData,
-        base_price: formData.base_price ? parseFloat(formData.base_price) : null,
-        slug: generateSlug(formData.name)
+        price: formData.price ? parseFloat(formData.price) : 0,
+        stock_quantity: formData.stock_quantity ? parseInt(formData.stock_quantity) : 0
       };
       
       let response;

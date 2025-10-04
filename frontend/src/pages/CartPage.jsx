@@ -179,15 +179,15 @@ const CartPage = () => {
 
                       {/* Product Info */}
                       <div className="flex-1 min-w-0">
-                        <Link to={`/product/${item.product.slug}`}>
+                        <Link to={`/product/${item.product_id}`}>
                           <h3 className="font-semibold text-white hover:text-orange-400 transition-colors line-clamp-2">
-                            {item.product.name}
+                            {item.product_name}
                           </h3>
                         </Link>
                         
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
-                          <span>Артикул: {item.product.sku}</span>
-                          <span>Бренд: {item.product.brand}</span>
+                          <span>ID: {item.product_id.slice(0, 8)}...</span>
+                          <span>Цена за шт: {formatPrice(item.product_price)} ₽</span>
                         </div>
 
                         <div className="flex items-center justify-between mt-4">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -8,7 +8,6 @@ import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Eye, EyeOff, Phone, Mail, RotateCw } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import { authStorage } from '../utils/storage';
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);

@@ -260,10 +260,8 @@ const AdminProducts = () => {
             <ProductForm 
               product={selectedProduct}
               onClose={() => setSelectedProduct(null)} 
-              onSave={(updatedProduct) => {
-                setProducts(prev => prev.map(p => 
-                  p.id === updatedProduct.id ? updatedProduct : p
-                ));
+              onSave={() => {
+                loadProducts();
                 setSelectedProduct(null);
               }}
             />

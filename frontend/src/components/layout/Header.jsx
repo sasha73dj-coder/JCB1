@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Phone, Mail } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Phone, Mail, LogOut } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
+import { useAuth } from '../../contexts/AuthContext';
+import { cartStorage } from '../../utils/storage';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [cartItemsCount, setCartItemsCount] = useState(0);
   const navigate = useNavigate();
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
   
-  // Mock cart items count
-  const cartItemsCount = 3;
+  // Update cart count
+  useEffect(() => {
+    const updateCartCount = () => {
+      const count = cartStorage.getItemCount();
+      setCartItemsCount(count);
+    };
+    
+    updateCartCount();
+    
+    // Listen for cart changes
+    const interval = setInterval(updateCartCount, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();

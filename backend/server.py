@@ -1,15 +1,12 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
-import logging
-from pathlib import Path
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import datetime
+import bcrypt
+import logging
+from database import Database
 
 
 ROOT_DIR = Path(__file__).parent

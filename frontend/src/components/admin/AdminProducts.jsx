@@ -37,53 +37,28 @@ const AdminProducts = () => {
 
   // Load products on component mount
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/api/products`);
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
-      } else {
-        toast({
-          title: 'Ошибка загрузки',
-          description: 'Не удалось загрузить список товаров',
-          variant: 'destructive'
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast({
-        title: 'Ошибка сети',
-        description: 'Проверьте подключение к интернету',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
-    }
+  const loadProducts = () => {
+    const allProducts = productsStorage.getAll();
+    setProducts(allProducts);
   };
 
-  const deleteProduct = async (productId) => {
+  const deleteProduct = (productId) => {
     if (!window.confirm('Вы уверены, что хотите удалить этот товар?')) {
       return;
     }
     
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/products/${productId}`, {
-        method: 'DELETE',
+    const success = productsStorage.delete(productId);
+    
+    if (success) {
+      loadProducts();
+      toast({
+        title: 'Товар удален',
+        description: 'Товар успешно удален из каталога'
       });
-      
-      if (response.ok) {
-        setProducts(prev => prev.filter(p => p.id !== productId));
-        toast({
-          title: 'Товар удален',
-          description: 'Товар успешно удален из каталога'
-        });
-      }
-    } catch (error) {
+    } else {
       toast({
         title: 'Ошибка',
         description: 'Не удалось удалить товар',

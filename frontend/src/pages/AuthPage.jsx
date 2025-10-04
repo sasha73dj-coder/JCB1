@@ -6,8 +6,9 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Eye, EyeOff, Phone, Mail } from 'lucide-react';
+import { Eye, EyeOff, Phone, Mail, RotateCw } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { authStorage } from '../utils/storage';
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);

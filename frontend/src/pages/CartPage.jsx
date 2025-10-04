@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, RotateCw } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { products } from '../data/mockData';
 
 const CartPage = () => {
-  // Mock cart items
-  const [cartItems, setCartItems] = useState([
-    { id: 1, product: products[0], quantity: 2 },
-    { id: 2, product: products[1], quantity: 1 },
-    { id: 3, product: products[2], quantity: 3 }
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState({});
+  const navigate = useNavigate();
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  
+  // Get current user ID (in real app, from auth context)
+  const getCurrentUserId = () => {
+    return localStorage.getItem('user_id') || 'anonymous_user';
+  };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('ru-RU').format(price);

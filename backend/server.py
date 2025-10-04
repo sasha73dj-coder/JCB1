@@ -369,42 +369,74 @@ async def delete_supplier(supplier_id: str):
         raise HTTPException(status_code=404, detail="Supplier not found")
     return {"message": "Supplier deleted successfully"}
 
-# Product Routes
-@api_router.post("/products", response_model=Product)
-async def create_product(product_data: ProductCreate):
-    product_dict = product_data.dict()
-    if product_dict.get('id') is None:
-        product_dict['id'] = str(uuid.uuid4())
-    
-    product = Product(**product_dict)
-    prepared_data = prepare_for_mongo(product.dict())
-    result = await db.products.insert_one(prepared_data)
+# Product Routes  
+class ProductCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    part_number: str
+    brand: str
+    category: str
+    price: float
+    image_url: Optional[str] = None
+    stock_quantity: int = 0
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    part_number: Optional[str] = None
+    brand: Optional[str] = None
+    category: Optional[str] = None
+    price: Optional[float] = None
+    image_url: Optional[str] = None
+    stock_quantity: Optional[int] = None
+
+@api_router.post("/products")
+def create_product(product_data: ProductCreate):
+    product = Database.add_product(product_data.dict())
     return product
 
-@api_router.get("/products", response_model=List[Product])
-async def get_products(
+@api_router.get("/products")
+def get_products(
     brand: Optional[str] = None,
     category: Optional[str] = None,
-    part_number: Optional[str] = None
+    search: Optional[str] = None
 ):
-    query = {}
-    if brand:
-        query["brand"] = {"$regex": brand, "$options": "i"}
-    if category:
-        query["category"] = {"$regex": category, "$options": "i"}
-    if part_number:
-        query["part_number"] = {"$regex": part_number, "$options": "i"}
+    products = Database.get_products()
     
-    products = await db.products.find(query).to_list(1000)
-    return [Product(**parse_from_mongo(product)) for product in products]
+    # Filter products
+    if brand:
+        products = [p for p in products if p.get("brand", "").lower() == brand.lower()]
+    if category:
+        products = [p for p in products if p.get("category", "").lower() == category.lower()]
+    if search:
+        search_lower = search.lower()
+        products = [p for p in products if 
+                   search_lower in p.get("name", "").lower() or 
+                   search_lower in p.get("description", "").lower() or
+                   search_lower in p.get("part_number", "").lower()]
+    
+    return products
 
-@api_router.get("/products/{product_id}", response_model=Product)
-async def get_product(product_id: str):
-    product = await db.products.find_one({"id": product_id})
+@api_router.get("/products/{product_id}")
+def get_product(product_id: str):
+    product = Database.get_product(product_id)
     if not product:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Product not found")
-    return Product(**parse_from_mongo(product))
+    return product
+
+@api_router.put("/products/{product_id}")
+def update_product(product_id: str, product_data: ProductUpdate):
+    updated_product = Database.update_product(product_id, product_data.dict(exclude_unset=True))
+    if not updated_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return updated_product
+
+@api_router.delete("/products/{product_id}")
+def delete_product(product_id: str):
+    success = Database.delete_product(product_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product deleted successfully"}
 
 # Product Offers from Suppliers
 @api_router.get("/products/{product_id}/offers", response_model=List[ProductOffer])

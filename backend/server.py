@@ -775,6 +775,90 @@ async def test_supplier_connection(supplier_id: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Initialize default data
+@app.on_event("startup")
+async def create_default_data():
+    # Create default delivery methods
+    existing_delivery = await db.delivery_methods.find_one({})
+    if not existing_delivery:
+        default_delivery_methods = [
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Курьерская доставка по Москве",
+                "description": "Доставка курьером в пределах МКАД",
+                "price": 500.0,
+                "estimated_days": 1,
+                "is_active": True
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Самовывоз",
+                "description": "Забрать со склада в Москве",
+                "price": 0.0,
+                "estimated_days": 0,
+                "is_active": True
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Транспортная компания",
+                "description": "Доставка по всей России",
+                "price": 1200.0,
+                "estimated_days": 5,
+                "is_active": True
+            }
+        ]
+        await db.delivery_methods.insert_many(default_delivery_methods)
+        logger.info("Created default delivery methods")
+    
+    # Create default payment methods
+    existing_payment = await db.payment_methods.find_one({})
+    if not existing_payment:
+        default_payment_methods = [
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Банковская карта",
+                "type": "card",
+                "config": {"description": "Visa, MasterCard, МИР"},
+                "is_active": True
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Наличными при получении",
+                "type": "cash",
+                "config": {"description": "Оплата курьеру или в пункте выдачи"},
+                "is_active": True
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "name": "Банковский перевод",
+                "type": "transfer",
+                "config": {"description": "Для юридических лиц"},
+                "is_active": True
+            }
+        ]
+        await db.payment_methods.insert_many(default_payment_methods)
+        logger.info("Created default payment methods")
+    
+    # Create admin user if not exists
+    existing_admin = await db.users.find_one({"role": "admin"})
+    if not existing_admin:
+        import bcrypt
+        password_hash = bcrypt.hashpw("admin123".encode(), bcrypt.gensalt()).decode()
+        
+        admin_user = {
+            "id": str(uuid.uuid4()),
+            "email": "admin@nexx.ru",
+            "phone": "+79991234567",
+            "password_hash": password_hash,
+            "name": "Администратор",
+            "role": "admin",
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(admin_user)
+        logger.info("Created default admin user: admin@nexx.ru / admin123")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

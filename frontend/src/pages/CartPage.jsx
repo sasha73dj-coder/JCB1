@@ -197,9 +197,14 @@ const CartPage = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={updating[item.id]}
                               className="border-gray-600 text-white w-8 h-8 p-0"
                             >
-                              <Minus className="h-4 w-4" />
+                              {updating[item.id] ? (
+                                <RotateCw className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Minus className="h-4 w-4" />
+                              )}
                             </Button>
                             <span className="text-white px-3 py-1 bg-gray-700 rounded">
                               {item.quantity}
@@ -208,9 +213,14 @@ const CartPage = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              disabled={updating[item.id]}
                               className="border-gray-600 text-white w-8 h-8 p-0"
                             >
-                              <Plus className="h-4 w-4" />
+                              {updating[item.id] ? (
+                                <RotateCw className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Plus className="h-4 w-4" />
+                              )}
                             </Button>
                           </div>
 

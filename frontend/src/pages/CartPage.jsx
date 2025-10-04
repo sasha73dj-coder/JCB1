@@ -7,18 +7,36 @@ import { Card, CardContent } from '../components/ui/card';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState({});
   const navigate = useNavigate();
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  
+  // Get current user ID (in real app, from auth context)
+  const getCurrentUserId = () => {
+    return localStorage.getItem('current_user_id') || 'anonymous_user';
+  };
 
   // Load cart items on component mount
   useEffect(() => {
     loadCartItems();
   }, []);
 
-  const loadCartItems = () => {
-    const items = cartStorage.getItems();
-    setCartItems(items);
+  const loadCartItems = async () => {
+    try {
+      setLoading(true);
+      const userId = getCurrentUserId();
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCartItems(data);
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatPrice = (price) => {

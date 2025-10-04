@@ -438,62 +438,65 @@ def delete_product(product_id: str):
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted successfully"}
 
-# Product Offers from Suppliers
-@api_router.get("/products/{product_id}/offers", response_model=List[ProductOffer])
-async def get_product_offers(product_id: str):
-    """Get all supplier offers for a specific product"""
-    # First check if product exists
-    product = await db.products.find_one({"id": product_id})
-    if not product:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    # Get offers from all active suppliers
-    offers = []
-    active_suppliers = await db.suppliers.find({"status": "active"}).to_list(1000)
-    
-    for supplier_data in active_suppliers:
-        supplier = Supplier(**parse_from_mongo(supplier_data))
-        
-        # Mock supplier API call - in real implementation, this would call actual supplier APIs
-        offer = await mock_supplier_api_call(supplier, product_id, Product(**parse_from_mongo(product)))
-        if offer:
-            offers.append(offer)
-    
-    return offers
+# Cart Routes
+class CartAddRequest(BaseModel):
+    product_id: str
+    quantity: int = 1
 
-async def mock_supplier_api_call(supplier: Supplier, product_id: str, product: Product) -> Optional[ProductOffer]:
-    """Mock supplier API call - replace with actual API integration"""
-    import random
+@api_router.post("/cart/{user_id}/items")
+def add_to_cart(user_id: str, request: CartAddRequest):
+    cart = Database.add_to_cart(user_id, request.product_id, request.quantity)
+    return {"message": "Product added to cart", "cart": cart}
+
+@api_router.get("/cart/{user_id}")
+def get_cart(user_id: str):
+    cart = Database.get_cart(user_id)
+    return cart
+
+@api_router.put("/cart/{user_id}/items/{item_id}")
+def update_cart_item(user_id: str, item_id: str, quantity: int):
+    cart = Database.update_cart_item(user_id, item_id, quantity)
+    return cart
+
+@api_router.delete("/cart/{user_id}/items/{item_id}")
+def remove_from_cart(user_id: str, item_id: str):
+    cart = Database.remove_from_cart(user_id, item_id)
+    return {"message": "Item removed from cart", "cart": cart}
+
+@api_router.delete("/cart/{user_id}")
+def clear_cart(user_id: str):
+    cart = Database.clear_cart(user_id)
+    return {"message": "Cart cleared", "cart": cart}
+
+# Orders Routes
+class OrderCreate(BaseModel):
+    user_name: str
+    user_email: str
+    user_phone: str
+    delivery_address: str
+    notes: Optional[str] = None
+
+@api_router.post("/orders")
+def create_order(user_id: str, order_data: OrderCreate):
+    cart = Database.get_cart(user_id)
+    if not cart:
+        raise HTTPException(status_code=400, detail="Cart is empty")
     
-    # Mock stock availability (70% chance of having stock)
-    if random.random() < 0.3:
-        return None
+    order = Database.add_order({
+        "user_id": user_id,
+        "items": cart,
+        "total_amount": sum(item["product_price"] * item["quantity"] for item in cart),
+        **order_data.dict()
+    })
     
-    # Mock wholesale price calculation
-    base_price = product.base_price or random.uniform(10000, 200000)
-    wholesale_price = base_price * random.uniform(0.7, 0.9)  # 70-90% of base price
+    # Clear cart after creating order
+    Database.clear_cart(user_id)
     
-    # Calculate client price with markup
-    markup_percentage = supplier.pricing_config.markup_percentage
-    min_markup = supplier.pricing_config.min_markup_amount or 0
-    
-    markup_amount = max(wholesale_price * (markup_percentage / 100), min_markup)
-    client_price = wholesale_price + markup_amount
-    
-    return ProductOffer(
-        supplier_id=supplier.id,
-        supplier_name=supplier.name,
-        product_id=product_id,
-        part_number=product.part_number,
-        wholesale_price=round(wholesale_price, 2),
-        client_price=round(client_price, 2),
-        currency=supplier.pricing_config.currency,
-        stock_quantity=random.randint(1, 50),
-        delivery_time_days=supplier.delivery_time_days + random.randint(0, 3),
-        supplier_rating=supplier.rating,
-        last_updated=datetime.now(timezone.utc)
-    )
+    return order
+
+@api_router.get("/orders")
+def get_orders():
+    return Database.get_orders()
 
 # Simple models for file-based storage
 class SimpleUser(BaseModel):

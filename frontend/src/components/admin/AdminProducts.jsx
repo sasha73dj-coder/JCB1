@@ -19,16 +19,15 @@ import {
   Package
 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
+import { productsStorage } from '../../utils/storage';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { toast } = useToast();
-  
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

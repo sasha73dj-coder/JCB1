@@ -119,6 +119,21 @@ const CartPage = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className="bg-gray-900 min-h-screen">
+          <div className="container mx-auto px-4 py-16">
+            <div className="text-center">
+              <RotateCw className="h-12 w-12 text-orange-400 mx-auto mb-4 animate-spin" />
+              <p className="text-white">Загрузка корзины...</p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   if (cartItems.length === 0) {
     return (
       <Layout>

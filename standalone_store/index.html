@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXX - Оригинальные запчасти JCB</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1f2937 0%, #111827 100%); }
+        .text-orange { color: #f97316; }
+        .bg-orange { background-color: #f97316; }
+        .hover-orange:hover { background-color: #ea580c; }
+        .card-hover:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Header -->
+    <header class="gradient-bg shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <!-- Top Bar -->
+            <div class="border-b border-gray-700 py-2">
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex space-x-4">
+                        <span><i class="fas fa-phone text-orange"></i> +7 (495) 123-45-67</span>
+                        <span><i class="fas fa-envelope text-orange"></i> info@nexx.ru</span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-orange transition-colors">Войти</a>
+                        <a href="#" class="hover:text-orange transition-colors">Регистрация</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Header -->
+            <div class="py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-8">
+                        <h1 class="text-3xl font-bold text-orange">NEXX</h1>
+                        <nav class="hidden md:flex space-x-6">
+                            <a href="#" onclick="showPage('home')" class="hover:text-orange transition-colors">Главная</a>
+                            <a href="#" onclick="showPage('catalog')" class="hover:text-orange transition-colors">Каталог</a>
+                            <a href="#" class="hover:text-orange transition-colors">О компании</a>
+                            <a href="#" class="hover:text-orange transition-colors">Доставка</a>
+                            <a href="#" class="hover:text-orange transition-colors">Контакты</a>
+                        </nav>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Поиск товаров..." 
+                                   class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-64 focus:outline-none focus:border-orange">
+                            <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <div class="relative">
+                            <button onclick="showCart()" class="bg-orange hover-orange px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="ml-2">Корзина</span>
+                                <span id="cartCount" class="bg-red-500 text-white rounded-full px-2 py-1 text-xs ml-2">0</span>
+                            </button>
+                        </div>
+                        
+                        <button onclick="showAdmin()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-cog"></i> Админ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Page -->
+        <div id="homePage" class="page">
+            <!-- Hero Section -->
+            <section class="gradient-bg py-20">
+                <div class="container mx-auto px-4 text-center">
+                    <h2 class="text-5xl font-bold mb-6">Оригинальные запчасти JCB</h2>
+                    <p class="text-xl text-gray-300 mb-8">Качественные комплектующие для вашей спецтехники</p>
+                    <button onclick="showPage('catalog')" class="bg-orange hover-orange px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
+                        Перейти в каталог
+                    </button>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section class="py-16 bg-gray-800">
+                <div class="container mx-auto px-4">
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <div class="bg-orange rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-shield-alt text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">Гарантия качества</h3>
+                            <p class="text-gray-300">Все запчасти сертифицированы и имеют гарантию производителя</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-orange rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-shipping-fast text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">Быстрая доставка</h3>
+                            <p class="text-gray-300">Доставляем по всей России в кратчайшие сроки</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-orange rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-warehouse text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">В наличии</h3>
+                            <p class="text-gray-300">Большой склад запчастей всегда в наличии</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Catalog Page -->
+        <div id="catalogPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h1 class="text-3xl font-bold mb-8">Каталог товаров</h1>
+                
+                <!-- Filters -->
+                <div class="bg-gray-800 rounded-lg p-6 mb-8">
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Бренд</label>
+                            <select class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                                <option>Все бренды</option>
+                                <option>JCB</option>
+                                <option>Caterpillar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Категория</label>
+                            <select class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                                <option>Все категории</option>
+                                <option>Двигатель</option>
+                                <option>Гидравлика</option>
+                                <option>Электрика</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Цена от</label>
+                            <input type="number" placeholder="0" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Цена до</label>
+                            <input type="number" placeholder="1000000" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="productsGrid" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Products will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Page -->
+        <div id="cartPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h1 class="text-3xl font-bold mb-8">Корзина</h1>
+                <div id="cartContent">
+                    <!-- Cart content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Page -->
+        <div id="adminPage" class="page hidden">
+            <div class="container mx-auto px-4 py-8">
+                <h1 class="text-3xl font-bold mb-8">Панель администратора</h1>
+                
+                <!-- Admin Stats -->
+                <div class="grid md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-2">Товары</h3>
+                        <div class="text-3xl font-bold text-orange" id="adminProductCount">5</div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-2">Заказы</h3>
+                        <div class="text-3xl font-bold text-green-400" id="adminOrderCount">12</div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-2">Пользователи</h3>
+                        <div class="text-3xl font-bold text-blue-400">156</div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-2">Выручка</h3>
+                        <div class="text-3xl font-bold text-yellow-400">2.4M ₽</div>
+                    </div>
+                </div>
+
+                <!-- Admin Actions -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold">Управление товарами</h2>
+                        <button onclick="showAddProductModal()" class="bg-orange hover-orange px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-plus mr-2"></i> Добавить товар
+                        </button>
+                    </div>
+                    
+                    <!-- Products Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="pb-2">Название</th>
+                                    <th class="pb-2">Артикул</th>
+                                    <th class="pb-2">Цена</th>
+                                    <th class="pb-2">Остаток</th>
+                                    <th class="pb-2">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminProductsTable">
+                                <!-- Products will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-800 rounded-lg p-8 w-full max-w-2xl">
+                <h2 class="text-2xl font-bold mb-6">Добавить новый товар</h2>
+                
+                <form id="addProductForm" onsubmit="addProduct(event)">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Название товара</label>
+                            <input type="text" name="name" required class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Артикул</label>
+                            <input type="text" name="sku" required class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Описание</label>
+                        <textarea name="description" rows="3" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full"></textarea>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Бренд</label>
+                            <input type="text" name="brand" required class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Категория</label>
+                            <select name="category" required class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                                <option value="">Выберите категорию</option>
+                                <option value="Двигатель">Двигатель</option>
+                                <option value="Гидравлика">Гидравлика</option>
+                                <option value="Электрика">Электрика</option>
+                                <option value="Трансмиссия">Трансмиссия</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Цена (₽)</label>
+                            <input type="number" name="price" required class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">URL изображения</label>
+                            <input type="url" name="image" placeholder="https://example.com/image.jpg" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Количество на складе</label>
+                            <input type="number" name="stock" required class="bg-gray-700 border border-gray-600 rounded px-3 py-2 w-full">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="hideAddProductModal()" class="px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                            Отмена
+                        </button>
+                        <button type="submit" class="bg-orange hover-orange px-4 py-2 rounded-lg transition-colors">
+                            Добавить товар
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

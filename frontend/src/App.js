@@ -35,7 +35,8 @@ function App() {
           <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/search" element={<SearchPage />} />
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AuthProvider>
     </div>
   );
 }

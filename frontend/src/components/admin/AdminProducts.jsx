@@ -19,7 +19,6 @@ import {
   Package
 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import { productsStorage } from '../../utils/storage';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);

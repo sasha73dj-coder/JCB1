@@ -13,16 +13,37 @@ const ProductPage = () => {
   const { slug } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [supplierOffers, setSupplierOffers] = useState([]);
-  const [loadingOffers, setLoadingOffers] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  
+  // Get current user ID (in real app, from auth context)
+  const getCurrentUserId = () => {
+    return localStorage.getItem('current_user_id') || 'anonymous_user';
+  };
+
   // Load product data
   useEffect(() => {
-    const foundProduct = productsStorage.getBySlug(slug);
-    setProduct(foundProduct);
+    loadProduct();
   }, [slug]);
+
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/products`);
+      if (response.ok) {
+        const products = await response.json();
+        const foundProduct = products.find(p => p.slug === slug);
+        setProduct(foundProduct);
+      }
+    } catch (error) {
+      console.error('Error loading product:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const addToCart = () => {
     if (!product) return;

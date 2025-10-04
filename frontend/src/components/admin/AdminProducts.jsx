@@ -313,8 +313,9 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
     part_number: product?.part_number || '',
     brand: product?.brand || '',
     category: product?.category || '',
-    base_price: product?.base_price || '',
-    image_url: product?.image_url || ''
+    price: product?.price || '',
+    image_url: product?.image_url || '',
+    stock_quantity: product?.stock_quantity || 0
   });
   
   const [loading, setLoading] = useState(false);

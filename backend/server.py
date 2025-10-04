@@ -463,63 +463,84 @@ async def mock_supplier_api_call(supplier: Supplier, product_id: str, product: P
         last_updated=datetime.now(timezone.utc)
     )
 
-# User Management Routes
-@api_router.post("/users/register", response_model=User)
-async def register_user(user_data: UserCreate):
-    # Check if user exists
-    existing_user = None
-    if user_data.email:
-        existing_user = await db.users.find_one({"email": user_data.email})
-    if user_data.phone and not existing_user:
-        existing_user = await db.users.find_one({"phone": user_data.phone})
-    
-    if existing_user:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="User already exists")
-    
-    # Hash password
-    password_hash = bcrypt.hashpw(user_data.password.encode(), bcrypt.gensalt()).decode()
-    
-    user = User(
-        email=user_data.email,
-        phone=user_data.phone,
-        password_hash=password_hash,
-        name=user_data.name
-    )
-    
-    prepared_data = prepare_for_mongo(user.dict())
-    await db.users.insert_one(prepared_data)
-    return user
+# Simple models for file-based storage
+class SimpleUser(BaseModel):
+    id: str
+    username: str
+    email: str
+    name: str
+    role: str
 
-@api_router.post("/users/login")
-async def login_user(login_data: UserLogin):
-    # Find user by email or phone
-    user = None
-    if "@" in login_data.email_or_phone:
-        user = await db.users.find_one({"email": login_data.email_or_phone})
-    else:
-        user = await db.users.find_one({"phone": login_data.email_or_phone})
-    
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+    name: str
+
+# Authentication Routes
+@api_router.post("/auth/login")
+def login_user(login_data: LoginRequest):
+    user = Database.get_user_by_username(login_data.username)
     if not user:
-        from fastapi import HTTPException
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Verify password
     if not bcrypt.checkpw(login_data.password.encode(), user["password_hash"].encode()):
-        from fastapi import HTTPException
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    user_obj = User(**parse_from_mongo(user))
+    # Return user without password
+    user_response = {
+        "id": user["id"],
+        "username": user["username"],
+        "email": user["email"],
+        "name": user["name"],
+        "role": user["role"]
+    }
+    
     return {
-        "user": user_obj,
-        "token": f"token_{user_obj.id}",  # In real app, use JWT
+        "success": True,
+        "user": user_response,
         "message": "Login successful"
     }
 
-@api_router.get("/users", response_model=List[User])
-async def get_users():
-    users = await db.users.find().to_list(1000)
-    return [User(**parse_from_mongo(user)) for user in users]
+@api_router.post("/auth/register")
+def register_user(register_data: RegisterRequest):
+    # Check if user exists
+    existing_user = Database.get_user_by_username(register_data.username)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+    
+    # Hash password
+    password_hash = bcrypt.hashpw(register_data.password.encode(), bcrypt.gensalt()).decode()
+    
+    user_data = {
+        "username": register_data.username,
+        "email": register_data.email,
+        "password_hash": password_hash,
+        "name": register_data.name,
+        "role": "user"
+    }
+    
+    user = Database.add_user(user_data)
+    
+    # Return user without password
+    user_response = {
+        "id": user["id"],
+        "username": user["username"],
+        "email": user["email"],
+        "name": user["name"],
+        "role": user["role"]
+    }
+    
+    return {
+        "success": True,
+        "user": user_response,
+        "message": "Registration successful"
+    }
 
 # Cart Management Routes
 @api_router.post("/cart/{user_id}/items", response_model=CartItem)

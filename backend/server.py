@@ -505,7 +505,6 @@ async def login_user(login_data: UserLogin):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Verify password
-    import bcrypt
     if not bcrypt.checkpw(login_data.password.encode(), user["password_hash"].encode()):
         from fastapi import HTTPException
         raise HTTPException(status_code=401, detail="Invalid credentials")

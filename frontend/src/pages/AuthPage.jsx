@@ -12,6 +12,7 @@ import { authStorage } from '../utils/storage';
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -29,18 +30,41 @@ const AuthPage = () => {
   });
   const [isCodeSent, setIsCodeSent] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Mock login
-    toast({
-      title: 'Успешно!',
-      description: 'Вы вошли в систему'
-    });
+    setLoading(true);
+    
+    setTimeout(() => {
+      const result = authStorage.login(loginData.email, loginData.password);
+      
+      if (result.success) {
+        toast({
+          title: 'Успешно!',
+          description: `Добро пожаловать, ${result.user.name}!`
+        });
+        
+        // Redirect based on role
+        if (result.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      } else {
+        toast({
+          title: 'Ошибка входа',
+          description: result.error,
+          variant: 'destructive'
+        });
+      }
+      setLoading(false);
+    }, 1000);
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
+    
     if (registerData.password !== registerData.confirmPassword) {
       toast({
         title: 'Ошибка',

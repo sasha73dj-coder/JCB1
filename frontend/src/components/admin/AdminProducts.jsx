@@ -183,64 +183,92 @@ const AdminProducts = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentProducts.map((product) => (
-                  <tr key={product.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <span className="text-gray-500 text-xs">Фото</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-white font-medium text-sm line-clamp-2">
-                            {product.name}
-                          </h4>
-                          <p className="text-gray-400 text-xs mt-1">
-                            Рейтинг: {product.rating} ({product.reviewsCount})
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="text-gray-300 font-mono text-sm">{product.sku}</span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="text-gray-300">{product.brand}</span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div>
-                        <span className="text-white font-semibold">{formatPrice(product.price)} ₽</span>
-                        {product.originalPrice && (
-                          <div className="text-gray-400 text-xs line-through">
-                            {formatPrice(product.originalPrice)} ₽
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <Badge className={getStockColor(product.stockLevel)}>
-                        {product.availability}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-4">
-                      <Badge className="bg-green-500/20 text-green-400">
-                        Активный
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 px-4 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <RotateCw className="h-5 w-5 animate-spin text-orange-400" />
+                        <span className="text-gray-400">Загрузка товаров...</span>
                       </div>
                     </td>
                   </tr>
-                ))}
+                ) : filteredProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 px-4 text-center text-gray-400">
+                      Товары не найдены
+                    </td>
+                  </tr>
+                ) : (
+                  filteredProducts.map((product) => (
+                    <tr key={product.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                            {product.image_url ? (
+                              <img src={product.image_url} alt={product.name} className="w-12 h-12 object-cover rounded-lg" />
+                            ) : (
+                              <Package className="h-6 w-6 text-gray-500" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-white font-medium text-sm line-clamp-2">
+                              {product.name}
+                            </h4>
+                            <p className="text-gray-400 text-xs mt-1">
+                              {product.description ? product.description.substring(0, 50) + '...' : 'Без описания'}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-gray-300 font-mono text-sm">{product.part_number}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-gray-300">{product.brand}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div>
+                          <span className="text-white font-semibold">
+                            {product.base_price ? formatPrice(product.base_price) + ' ₽' : 'Не указана'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge className="bg-blue-500/20 text-blue-400">
+                          {product.category || 'Общая'}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge className="bg-green-500/20 text-green-400">
+                          Активен
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-yellow-400 hover:text-yellow-300"
+                            onClick={() => setSelectedProduct(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-400 hover:text-red-300"
+                            onClick={() => deleteProduct(product.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

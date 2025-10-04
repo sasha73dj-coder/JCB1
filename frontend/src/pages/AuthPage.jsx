@@ -31,14 +31,31 @@ const AuthPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     
-    setTimeout(() => {
-      const result = authStorage.login(loginData.email, loginData.password);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: loginData.email,
+          password: loginData.password
+        })
+      });
       
-      if (result.success) {
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        // Store user data in localStorage
+        localStorage.setItem('current_user', JSON.stringify(result.user));
+        localStorage.setItem('current_user_id', result.user.id);
+        
         toast({
           title: 'Успешно!',
           description: `Добро пожаловать, ${result.user.name}!`
@@ -53,12 +70,20 @@ const AuthPage = () => {
       } else {
         toast({
           title: 'Ошибка входа',
-          description: result.error,
+          description: result.detail || 'Неверный логин или пароль',
           variant: 'destructive'
         });
       }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: 'Ошибка сети',
+        description: 'Проверьте подключение к интернету',
+        variant: 'destructive'
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleRegister = (e) => {

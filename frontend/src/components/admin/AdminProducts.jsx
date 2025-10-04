@@ -319,6 +319,8 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
   
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
   const generateSlug = (name) => {
     return name

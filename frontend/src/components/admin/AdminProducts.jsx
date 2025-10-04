@@ -36,19 +36,65 @@ const AdminProducts = () => {
     product.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('ru-RU').format(price);
+  // Load products on component mount
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/products`);
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      } else {
+        toast({
+          title: 'Ошибка загрузки',
+          description: 'Не удалось загрузить список товаров',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      toast({
+        title: 'Ошибка сети',
+        description: 'Проверьте подключение к интернету',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const getStockColor = (stockLevel) => {
-    switch (stockLevel) {
-      case 'много':
-        return 'bg-green-500/20 text-green-400';
-      case 'мало':
-        return 'bg-yellow-500/20 text-yellow-400';
-      default:
-        return 'bg-red-500/20 text-red-400';
+  const deleteProduct = async (productId) => {
+    if (!window.confirm('Вы уверены, что хотите удалить этот товар?')) {
+      return;
     }
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/products/${productId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setProducts(prev => prev.filter(p => p.id !== productId));
+        toast({
+          title: 'Товар удален',
+          description: 'Товар успешно удален из каталога'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить товар',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('ru-RU').format(price);
   };
 
   return (

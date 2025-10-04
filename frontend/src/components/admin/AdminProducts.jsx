@@ -101,8 +101,8 @@ const AdminProducts = () => {
               </DialogHeader>
               <ProductForm 
                 onClose={() => setIsAddingProduct(false)} 
-                onSave={(newProduct) => {
-                  setProducts(prev => [...prev, newProduct]);
+                onSave={() => {
+                  loadProducts();
                   setIsAddingProduct(false);
                 }}
               />

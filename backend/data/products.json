@@ -1,0 +1,72 @@
+[
+  {
+    "id": "d96607c4-9350-40c2-ac84-45285aff098a",
+    "name": "Фильтр гидравлический JCB 32/925994",
+    "description": "Оригинальный гидравлический фильтр для экскаваторов JCB. Высокое качество, длительный срок службы.",
+    "part_number": "32/925994",
+    "brand": "JCB",
+    "category": "Гидравлика",
+    "price": 8500,
+    "image_url": "/images/hydraulic-filter.jpg",
+    "slug": "filtr-gidravlicheskij-jcb-32-925994",
+    "in_stock": true,
+    "stock_quantity": 15,
+    "created_at": "2025-10-04T11:22:01.630624"
+  },
+  {
+    "id": "5968b5b6-82c4-4b58-9c0f-1044135ac905",
+    "name": "Тормозные колодки передние JCB 15/920200",
+    "description": "Высококачественные тормозные колодки для спецтехники JCB. Обеспечивают надежное торможение.",
+    "part_number": "15/920200",
+    "brand": "JCB",
+    "category": "Тормозная система",
+    "price": 12500,
+    "image_url": "/images/brake-pads.jpg",
+    "slug": "tormoznye-kolodki-jcb-15-920200",
+    "in_stock": true,
+    "stock_quantity": 8,
+    "created_at": "2025-10-04T11:22:01.630634"
+  },
+  {
+    "id": "ba990169-44fb-4775-9a7d-c5b5b9131e2b",
+    "name": "Масляный фильтр двигателя JCB 02/100284",
+    "description": "Оригинальный масляный фильтр для двигателей JCB. Обеспечивает чистоту масла и продлевает срок службы двигателя.",
+    "part_number": "02/100284",
+    "brand": "JCB",
+    "category": "Двигатель",
+    "price": 1200,
+    "image_url": "/images/oil-filter.jpg",
+    "slug": "maslyanyj-filtr-jcb-02-100284",
+    "in_stock": true,
+    "stock_quantity": 25,
+    "created_at": "2025-10-04T11:22:01.630639"
+  },
+  {
+    "id": "636cf0de-b8a1-4664-a0a2-dccddbfdda86",
+    "name": "Коленвал JCB 320/03336",
+    "description": "Коленчатый вал для двигателей JCB. Высокое качество изготовления, точное соответствие оригинальным спецификациям.",
+    "part_number": "320/03336",
+    "brand": "JCB",
+    "category": "Двигатель",
+    "price": 95000,
+    "image_url": "/images/crankshaft.jpg",
+    "slug": "kolenval-jcb-320-03336",
+    "in_stock": true,
+    "stock_quantity": 3,
+    "created_at": "2025-10-04T11:22:01.630647"
+  },
+  {
+    "id": "9a199f24-5ed9-4ec6-8f5e-1410223d41bc",
+    "name": "Гидронасос основной JCB 20/925592",
+    "description": "Основной гидравлический насос для экскаваторов JCB. Обеспечивает стабильную работу гидросистемы.",
+    "part_number": "20/925592",
+    "brand": "JCB",
+    "category": "Гидравлика",
+    "price": 185000,
+    "image_url": "/images/hydraulic-pump.jpg",
+    "slug": "gidronasos-osnovnoj-jcb-20-925592",
+    "in_stock": true,
+    "stock_quantity": 2,
+    "created_at": "2025-10-04T11:22:01.630653"
+  }
+]

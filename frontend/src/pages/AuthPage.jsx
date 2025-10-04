@@ -73,11 +73,33 @@ const AuthPage = () => {
       });
       return;
     }
-    // Mock registration
-    toast({
-      title: 'Успешно!',
-      description: 'Аккаунт создан успешно'
-    });
+    
+    setLoading(true);
+    
+    setTimeout(() => {
+      const result = authStorage.register({
+        name: registerData.name,
+        email: registerData.email,
+        phone: registerData.phone,
+        username: registerData.email,
+        password: registerData.password
+      });
+      
+      if (result.success) {
+        toast({
+          title: 'Аккаунт создан!',
+          description: `Добро пожаловать, ${result.user.name}!`
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: 'Ошибка регистрации',
+          description: result.error,
+          variant: 'destructive'
+        });
+      }
+      setLoading(false);
+    }, 1000);
   };
 
   const handleSendCode = (e) => {
@@ -85,17 +107,26 @@ const AuthPage = () => {
     setIsCodeSent(true);
     toast({
       title: 'Код отправлен',
-      description: 'Проверьте SMS сообщения'
+      description: 'Проверьте SMS сообщения (демо: используйте код 1234)'
     });
   };
 
   const handlePhoneAuth = (e) => {
     e.preventDefault();
-    // Mock phone authentication
-    toast({
-      title: 'Успешно!',
-      description: 'Вы вошли в систему'
-    });
+    
+    if (phoneAuthData.code === '1234') {
+      toast({
+        title: 'Успешно!',
+        description: 'Вы вошли в систему по SMS'
+      });
+      navigate('/');
+    } else {
+      toast({
+        title: 'Неверный код',
+        description: 'Проверьте введенный код',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (

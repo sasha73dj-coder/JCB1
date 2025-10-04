@@ -254,10 +254,21 @@ const ProductPage = () => {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button 
                     size="lg" 
+                    onClick={addToCart}
+                    disabled={addingToCart}
                     className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
                   >
-                    <ShoppingCart className="h-5 w-5 mr-2" />
-                    Добавить в корзину
+                    {addingToCart ? (
+                      <>
+                        <RotateCw className="h-5 w-5 mr-2 animate-spin" />
+                        Добавление...
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="h-5 w-5 mr-2" />
+                        Добавить в корзину
+                      </>
+                    )}
                   </Button>
                   
                   <div className="flex gap-2">

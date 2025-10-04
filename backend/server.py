@@ -35,46 +35,14 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
-# E-commerce Models
-class OrderStatus(str, Enum):
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
-    PROCESSING = "processing"
-    SHIPPED = "shipped"
-    DELIVERED = "delivered"
-    CANCELLED = "cancelled"
-
-class PaymentStatus(str, Enum):
-    PENDING = "pending"
-    PAID = "paid"
-    FAILED = "failed"
-    REFUNDED = "refunded"
-
-class UserRole(str, Enum):
-    USER = "user"
-    ADMIN = "admin"
-
-# User Management
-class User(BaseModel):
+# Simple status check models
+class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    password_hash: str
-    name: str
-    role: UserRole = UserRole.USER
-    is_active: bool = True
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    client_name: str
+    timestamp: datetime = Field(default_factory=lambda: datetime.now())
 
-class UserCreate(BaseModel):
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    password: str
-    name: str
-
-class UserLogin(BaseModel):
-    email_or_phone: str
-    password: str
+class StatusCheckCreate(BaseModel):
+    client_name: str
 
 # Cart Management
 class CartItem(BaseModel):

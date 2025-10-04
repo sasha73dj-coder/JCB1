@@ -399,6 +399,7 @@ const ProductPage = () => {
                               <div className="ml-4">
                                 <Button 
                                   size="sm" 
+                                  onClick={() => addSupplierOfferToCart(offer)}
                                   className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
                                 >
                                   <ShoppingCart className="h-4 w-4 mr-2" />

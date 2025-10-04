@@ -231,7 +231,7 @@ const CartPage = () => {
                                 {formatPrice(getItemTotal(item))} ₽
                               </div>
                               <div className="text-sm text-gray-400">
-                                {formatPrice(item.product.price)} ₽ за шт.
+                                {formatPrice(item.product_price)} ₽ за шт.
                               </div>
                             </div>
                             

@@ -451,12 +451,12 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="base_price" className="text-white">Цена (₽)</Label>
+          <Label htmlFor="price" className="text-white">Цена (₽)</Label>
           <Input
-            id="base_price"
+            id="price"
             type="number"
-            value={formData.base_price}
-            onChange={(e) => setFormData({...formData, base_price: e.target.value})}
+            value={formData.price}
+            onChange={(e) => setFormData({...formData, price: e.target.value})}
             className="bg-gray-700 border-gray-600 text-white"
           />
         </div>

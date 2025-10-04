@@ -114,10 +114,26 @@ const AdminProducts = () => {
             <Download className="h-4 w-4 mr-2" />
             Экспорт
           </Button>
-          <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-            <Plus className="h-4 w-4 mr-2" />
-            Добавить товар
-          </Button>
+          <Dialog open={isAddingProduct} onOpenChange={setIsAddingProduct}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                <Plus className="h-4 w-4 mr-2" />
+                Добавить товар
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-gray-800 border-gray-700 max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-white">Добавить новый товар</DialogTitle>
+              </DialogHeader>
+              <ProductForm 
+                onClose={() => setIsAddingProduct(false)} 
+                onSave={(newProduct) => {
+                  setProducts(prev => [...prev, newProduct]);
+                  setIsAddingProduct(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

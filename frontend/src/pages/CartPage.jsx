@@ -4,19 +4,13 @@ import Layout from '../components/layout/Layout';
 import { Trash2, Plus, Minus, ShoppingBag, RotateCw } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
+import { cartStorage } from '../utils/storage';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState({});
   const navigate = useNavigate();
-  
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-  
-  // Get current user ID (in real app, from auth context)
-  const getCurrentUserId = () => {
-    return localStorage.getItem('user_id') || 'anonymous_user';
-  };
 
   // Load cart items on component mount
   useEffect(() => {

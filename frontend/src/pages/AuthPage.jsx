@@ -311,9 +311,17 @@ const AuthPage = () => {
                       
                       <Button 
                         type="submit" 
+                        disabled={loading}
                         className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
                       >
-                        Создать аккаунт
+                        {loading ? (
+                          <>
+                            <RotateCw className="h-4 w-4 animate-spin mr-2" />
+                            Создание...
+                          </>
+                        ) : (
+                          'Создать аккаунт'
+                        )}
                       </Button>
                     </form>
                   </CardContent>

@@ -36,6 +36,141 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# E-commerce Models
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    PROCESSING = "processing"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+class PaymentStatus(str, Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    FAILED = "failed"
+    REFUNDED = "refunded"
+
+class UserRole(str, Enum):
+    USER = "user"
+    ADMIN = "admin"
+
+# User Management
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    password_hash: str
+    name: str
+    role: UserRole = UserRole.USER
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserCreate(BaseModel):
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    password: str
+    name: str
+
+class UserLogin(BaseModel):
+    email_or_phone: str
+    password: str
+
+# Cart Management
+class CartItem(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    product_id: str
+    product_name: str
+    product_price: float
+    quantity: int = 1
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CartItemCreate(BaseModel):
+    product_id: str
+    quantity: int = 1
+
+class CartItemUpdate(BaseModel):
+    quantity: int
+
+# Order Management
+class OrderItem(BaseModel):
+    product_id: str
+    product_name: str
+    product_price: float
+    quantity: int
+    total_price: float
+
+class DeliveryMethod(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    price: float
+    estimated_days: int
+    is_active: bool = True
+
+class PaymentMethod(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    type: str  # stripe, robokassa, yandex, etc.
+    config: Dict[str, Any] = {}
+    is_active: bool = True
+
+class Order(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    user_name: str
+    user_email: Optional[str] = None
+    user_phone: Optional[str] = None
+    items: List[OrderItem]
+    subtotal: float
+    delivery_method: DeliveryMethod
+    delivery_cost: float
+    total_amount: float
+    status: OrderStatus = OrderStatus.PENDING
+    payment_status: PaymentStatus = PaymentStatus.PENDING
+    payment_method: Optional[PaymentMethod] = None
+    delivery_address: str
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class OrderCreate(BaseModel):
+    user_name: str
+    user_email: Optional[str] = None
+    user_phone: Optional[str] = None
+    delivery_method_id: str
+    payment_method_id: Optional[str] = None
+    delivery_address: str
+    notes: Optional[str] = None
+
+# Settings Management
+class IntegrationSettings(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    type: str  # payment, delivery, supplier, 1c, etc.
+    provider: str  # stripe, cdek, api_name, etc.
+    config: Dict[str, Any]
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class IntegrationCreate(BaseModel):
+    name: str
+    type: str
+    provider: str
+    config: Dict[str, Any]
+    is_active: bool = True
+
+class SiteSettings(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    key: str
+    value: Any
+    type: str  # string, number, boolean, json
+    category: str  # general, payment, delivery, notifications
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Supplier Management Models
 class SupplierStatus(str, Enum):
     ACTIVE = "active"

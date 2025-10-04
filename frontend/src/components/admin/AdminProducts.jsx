@@ -22,11 +22,13 @@ import { useToast } from '../../hooks/use-toast';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { toast } = useToast();
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -39,28 +41,60 @@ const AdminProducts = () => {
     loadProducts();
   }, []);
 
-  const loadProducts = () => {
-    const allProducts = productsStorage.getAll();
-    setProducts(allProducts);
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/products`);
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      } else {
+        toast({
+          title: 'Ошибка загрузки',
+          description: 'Не удалось загрузить товары',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading products:', error);
+      toast({
+        title: 'Ошибка сети',
+        description: 'Проверьте подключение к интернету',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteProduct = (productId) => {
+  const deleteProduct = async (productId) => {
     if (!window.confirm('Вы уверены, что хотите удалить этот товар?')) {
       return;
     }
     
-    const success = productsStorage.delete(productId);
-    
-    if (success) {
-      loadProducts();
-      toast({
-        title: 'Товар удален',
-        description: 'Товар успешно удален из каталога'
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/products/${productId}`, {
+        method: 'DELETE',
       });
-    } else {
+      
+      if (response.ok) {
+        loadProducts();
+        toast({
+          title: 'Товар удален',
+          description: 'Товар успешно удален из каталога'
+        });
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось удалить товар',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось удалить товар',
+        title: 'Ошибка сети',
+        description: 'Проверьте подключение к интернету',
         variant: 'destructive'
       });
     }

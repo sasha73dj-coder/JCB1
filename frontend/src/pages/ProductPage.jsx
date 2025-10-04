@@ -15,16 +15,9 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [supplierOffers, setSupplierOffers] = useState([]);
-  const [loadingOffers, setLoadingOffers] = useState(true);
+  const [loadingOffers, setLoadingOffers] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
-  
-  const product = products.find(p => p.slug === slug);
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-  
-  // Get current user ID (in real app, from auth context)
-  const getCurrentUserId = () => {
-    return localStorage.getItem('user_id') || 'anonymous_user';
-  };
+  const [product, setProduct] = useState(null);
   
   // Load supplier offers
   useEffect(() => {

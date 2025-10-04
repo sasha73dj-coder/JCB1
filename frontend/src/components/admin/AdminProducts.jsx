@@ -331,53 +331,66 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
       .trim();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
-    setTimeout(() => {
-      try {
-        // Prepare data
-        const productData = {
-          ...formData,
-          base_price: formData.base_price ? parseFloat(formData.base_price) : null,
-          slug: generateSlug(formData.name)
-        };
-        
-        let savedProduct;
-        
-        if (product) {
-          // Update existing product
-          savedProduct = productsStorage.update(product.id, productData);
-        } else {
-          // Create new product
-          savedProduct = productsStorage.create(productData);
-        }
-        
-        if (savedProduct) {
-          toast({
-            title: product ? 'Товар обновлен' : 'Товар добавлен',
-            description: 'Данные успешно сохранены'
-          });
-          
-          if (onSave) {
-            onSave(savedProduct);
-          }
-          
-          onClose();
-        } else {
-          throw new Error('Ошибка сохранения товара');
-        }
-      } catch (error) {
-        toast({
-          title: 'Ошибка',
-          description: error.message,
-          variant: 'destructive'
+    try {
+      // Prepare data
+      const productData = {
+        ...formData,
+        base_price: formData.base_price ? parseFloat(formData.base_price) : null,
+        slug: generateSlug(formData.name)
+      };
+      
+      let response;
+      
+      if (product) {
+        // Update existing product
+        response = await fetch(`${BACKEND_URL}/api/products/${product.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(productData),
         });
-      } finally {
-        setLoading(false);
+      } else {
+        // Create new product
+        response = await fetch(`${BACKEND_URL}/api/products`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(productData),
+        });
       }
-    }, 500);
+      
+      if (response.ok) {
+        const savedProduct = await response.json();
+        toast({
+          title: product ? 'Товар обновлен' : 'Товар добавлен',
+          description: 'Данные успешно сохранены'
+        });
+        
+        if (onSave) {
+          onSave(savedProduct);
+        }
+        
+        onClose();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ошибка сохранения товара');
+      }
+    } catch (error) {
+      console.error('Error saving product:', error);
+      toast({
+        title: 'Ошибка',
+        description: error.message || 'Проверьте подключение к интернету',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -26,68 +26,34 @@ const CartPage = () => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
-  const updateQuantity = async (itemId, newQuantity) => {
+  const updateQuantity = (itemId, newQuantity) => {
     if (newQuantity < 1) {
       removeItem(itemId);
       return;
     }
     
-    try {
-      setUpdating(prev => ({ ...prev, [itemId]: true }));
-      const userId = getCurrentUserId();
-      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items/${itemId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ quantity: newQuantity })
-      });
-      
-      if (response.ok) {
-        setCartItems(items => 
-          items.map(item => 
-            item.id === itemId ? { ...item, quantity: newQuantity } : item
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error updating quantity:', error);
-    } finally {
+    setUpdating(prev => ({ ...prev, [itemId]: true }));
+    
+    setTimeout(() => {
+      cartStorage.updateItem(itemId, newQuantity);
+      loadCartItems();
       setUpdating(prev => ({ ...prev, [itemId]: false }));
-    }
+    }, 200);
   };
 
-  const removeItem = async (itemId) => {
-    try {
-      setUpdating(prev => ({ ...prev, [itemId]: true }));
-      const userId = getCurrentUserId();
-      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items/${itemId}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        setCartItems(items => items.filter(item => item.id !== itemId));
-      }
-    } catch (error) {
-      console.error('Error removing item:', error);
-    } finally {
+  const removeItem = (itemId) => {
+    setUpdating(prev => ({ ...prev, [itemId]: true }));
+    
+    setTimeout(() => {
+      cartStorage.removeItem(itemId);
+      loadCartItems();
       setUpdating(prev => ({ ...prev, [itemId]: false }));
-    }
+    }, 200);
   };
 
-  const clearCart = async () => {
-    try {
-      const userId = getCurrentUserId();
-      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        setCartItems([]);
-      }
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-    }
+  const clearCart = () => {
+    cartStorage.clear();
+    loadCartItems();
   };
 
   const getItemTotal = (item) => {

@@ -100,16 +100,27 @@ const AuthPage = () => {
     
     setLoading(true);
     
-    setTimeout(() => {
-      const result = authStorage.register({
-        name: registerData.name,
-        email: registerData.email,
-        phone: registerData.phone,
-        username: registerData.email,
-        password: registerData.password
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: registerData.email,
+          email: registerData.email,
+          password: registerData.password,
+          name: registerData.name
+        })
       });
       
-      if (result.success) {
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        // Store user data in localStorage
+        localStorage.setItem('current_user', JSON.stringify(result.user));
+        localStorage.setItem('current_user_id', result.user.id);
+        
         toast({
           title: 'Аккаунт создан!',
           description: `Добро пожаловать, ${result.user.name}!`
@@ -118,12 +129,20 @@ const AuthPage = () => {
       } else {
         toast({
           title: 'Ошибка регистрации',
-          description: result.error,
+          description: result.detail || 'Ошибка при создании аккаунта',
           variant: 'destructive'
         });
       }
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: 'Ошибка сети',
+        description: 'Проверьте подключение к интернету',
+        variant: 'destructive'
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleSendCode = (e) => {

@@ -14,23 +14,12 @@ const CartPage = () => {
 
   // Load cart items on component mount
   useEffect(() => {
-    fetchCartItems();
+    loadCartItems();
   }, []);
 
-  const fetchCartItems = async () => {
-    try {
-      setLoading(true);
-      const userId = getCurrentUserId();
-      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCartItems(data);
-      }
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-    } finally {
-      setLoading(false);
-    }
+  const loadCartItems = () => {
+    const items = cartStorage.getItems();
+    setCartItems(items);
   };
 
   const formatPrice = (price) => {

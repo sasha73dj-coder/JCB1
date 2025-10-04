@@ -288,60 +288,63 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
   
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
-  const handleSubmit = async (e) => {
+  const generateSlug = (name) => {
+    return name
+      .toLowerCase()
+      .replace(/[^а-яa-z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     
-    try {
-      const url = product 
-        ? `${BACKEND_URL}/api/products/${product.id}`
-        : `${BACKEND_URL}/api/products`;
-      
-      const method = product ? 'PUT' : 'POST';
-      
-      // Prepare data
-      const productData = {
-        ...formData,
-        base_price: formData.base_price ? parseFloat(formData.base_price) : null
-      };
-      
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData)
-      });
-      
-      if (response.ok) {
-        const savedProduct = await response.json();
+    setTimeout(() => {
+      try {
+        // Prepare data
+        const productData = {
+          ...formData,
+          base_price: formData.base_price ? parseFloat(formData.base_price) : null,
+          slug: generateSlug(formData.name)
+        };
         
-        toast({
-          title: product ? 'Товар обновлен' : 'Товар добавлен',
-          description: 'Данные успешно сохранены'
-        });
+        let savedProduct;
         
-        if (onSave) {
-          onSave(savedProduct);
+        if (product) {
+          // Update existing product
+          savedProduct = productsStorage.update(product.id, productData);
+        } else {
+          // Create new product
+          savedProduct = productsStorage.create(productData);
         }
         
-        onClose();
-      } else {
-        const error = await response.json();
-        throw new Error(error.detail || 'Ошибка сохранения');
+        if (savedProduct) {
+          toast({
+            title: product ? 'Товар обновлен' : 'Товар добавлен',
+            description: 'Данные успешно сохранены'
+          });
+          
+          if (onSave) {
+            onSave(savedProduct);
+          }
+          
+          onClose();
+        } else {
+          throw new Error('Ошибка сохранения товара');
+        }
+      } catch (error) {
+        toast({
+          title: 'Ошибка',
+          description: error.message,
+          variant: 'destructive'
+        });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: error.message,
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
-    }
+    }, 500);
   };
 
   return (

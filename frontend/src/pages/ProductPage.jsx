@@ -165,7 +165,7 @@ const ProductPage = () => {
               <div className="space-y-2">
                 <div className="flex items-baseline space-x-4">
                   <span className="text-3xl font-bold text-white">
-                    {formatPrice(product.price)} ₽
+                    {formatPrice(product.base_price || 0)} ₽
                   </span>
                   {product.originalPrice && (
                     <span className="text-xl text-gray-500 line-through">

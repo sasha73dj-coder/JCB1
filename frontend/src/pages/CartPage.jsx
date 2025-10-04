@@ -18,28 +18,97 @@ const CartPage = () => {
     return localStorage.getItem('user_id') || 'anonymous_user';
   };
 
+  // Load cart items on component mount
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
+
+  const fetchCartItems = async () => {
+    try {
+      setLoading(true);
+      const userId = getCurrentUserId();
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCartItems(data);
+      }
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
-  const updateQuantity = (itemId, newQuantity) => {
+  const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) {
       removeItem(itemId);
       return;
     }
-    setCartItems(items => 
-      items.map(item => 
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    
+    try {
+      setUpdating(prev => ({ ...prev, [itemId]: true }));
+      const userId = getCurrentUserId();
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: newQuantity })
+      });
+      
+      if (response.ok) {
+        setCartItems(items => 
+          items.map(item => 
+            item.id === itemId ? { ...item, quantity: newQuantity } : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    } finally {
+      setUpdating(prev => ({ ...prev, [itemId]: false }));
+    }
   };
 
-  const removeItem = (itemId) => {
-    setCartItems(items => items.filter(item => item.id !== itemId));
+  const removeItem = async (itemId) => {
+    try {
+      setUpdating(prev => ({ ...prev, [itemId]: true }));
+      const userId = getCurrentUserId();
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items/${itemId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        setCartItems(items => items.filter(item => item.id !== itemId));
+      }
+    } catch (error) {
+      console.error('Error removing item:', error);
+    } finally {
+      setUpdating(prev => ({ ...prev, [itemId]: false }));
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      const userId = getCurrentUserId();
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        setCartItems([]);
+      }
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+    }
   };
 
   const getItemTotal = (item) => {
-    return item.product.price * item.quantity;
+    return item.product_price * item.quantity;
   };
 
   const getTotalPrice = () => {

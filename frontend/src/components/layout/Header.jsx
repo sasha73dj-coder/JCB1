@@ -125,10 +125,34 @@ const Header = () => {
 
               {/* User Actions */}
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-orange-400">
-                  <User className="h-5 w-5" />
-                  <span className="hidden md:inline ml-2">Войти</span>
-                </Button>
+                {isAuthenticated() ? (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-300 hidden md:inline">
+                      Привет, {user?.name}
+                      {isAdmin() && (
+                        <Link to="/admin" className="ml-2 text-orange-400 hover:underline">
+                          [Админ]
+                        </Link>
+                      )}
+                    </span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-300 hover:text-red-400"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-5 w-5" />
+                      <span className="hidden md:inline ml-2">Выйти</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/auth">
+                    <Button variant="ghost" size="sm" className="text-gray-300 hover:text-orange-400">
+                      <User className="h-5 w-5" />
+                      <span className="hidden md:inline ml-2">Войти</span>
+                    </Button>
+                  </Link>
+                )}
                 
                 <Link to="/cart" className="relative">
                   <Button variant="ghost" size="sm" className="text-gray-300 hover:text-orange-400">

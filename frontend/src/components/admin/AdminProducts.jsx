@@ -463,15 +463,28 @@ const ProductForm = ({ product = null, onClose, onSave }) => {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="image_url" className="text-white">URL изображения</Label>
-        <Input
-          id="image_url"
-          value={formData.image_url}
-          onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-          className="bg-gray-700 border-gray-600 text-white"
-          placeholder="https://example.com/image.jpg"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="image_url" className="text-white">URL изображения</Label>
+          <Input
+            id="image_url"
+            value={formData.image_url}
+            onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+            placeholder="https://example.com/image.jpg"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="stock_quantity" className="text-white">Количество на складе</Label>
+          <Input
+            id="stock_quantity"
+            type="number"
+            min="0"
+            value={formData.stock_quantity}
+            onChange={(e) => setFormData({...formData, stock_quantity: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+          />
+        </div>
       </div>
 
       <div className="flex justify-end space-x-2 pt-4">

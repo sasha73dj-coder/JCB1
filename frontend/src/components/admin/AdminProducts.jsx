@@ -273,54 +273,210 @@ const AdminProducts = () => {
             </table>
           </div>
           
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-gray-400 text-sm">
-                Показано {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredProducts.length)} из {filteredProducts.length} товаров
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="border-gray-600 text-gray-300"
-                >
-                  Назад
-                </Button>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={currentPage === page 
-                      ? 'bg-orange-500 hover:bg-orange-600' 
-                      : 'border-gray-600 text-gray-300'
-                    }
-                  >
-                    {page}
-                  </Button>
-                ))}
-                
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="border-gray-600 text-gray-300"
-                >
-                  Далее
-                </Button>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
+      
+      {/* Edit Product Dialog */}
+      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+        <DialogContent className="bg-gray-800 border-gray-700 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white">Редактирование товара</DialogTitle>
+          </DialogHeader>
+          {selectedProduct && (
+            <ProductForm 
+              product={selectedProduct}
+              onClose={() => setSelectedProduct(null)} 
+              onSave={(updatedProduct) => {
+                setProducts(prev => prev.map(p => 
+                  p.id === updatedProduct.id ? updatedProduct : p
+                ));
+                setSelectedProduct(null);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+};
+
+// Product Form Component
+const ProductForm = ({ product = null, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    name: product?.name || '',
+    description: product?.description || '',
+    part_number: product?.part_number || '',
+    brand: product?.brand || '',
+    category: product?.category || '',
+    base_price: product?.base_price || '',
+    image_url: product?.image_url || ''
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const url = product 
+        ? `${BACKEND_URL}/api/products/${product.id}`
+        : `${BACKEND_URL}/api/products`;
+      
+      const method = product ? 'PUT' : 'POST';
+      
+      // Prepare data
+      const productData = {
+        ...formData,
+        base_price: formData.base_price ? parseFloat(formData.base_price) : null
+      };
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData)
+      });
+      
+      if (response.ok) {
+        const savedProduct = await response.json();
+        
+        toast({
+          title: product ? 'Товар обновлен' : 'Товар добавлен',
+          description: 'Данные успешно сохранены'
+        });
+        
+        if (onSave) {
+          onSave(savedProduct);
+        }
+        
+        onClose();
+      } else {
+        const error = await response.json();
+        throw new Error(error.detail || 'Ошибка сохранения');
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name" className="text-white">Название товара</Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="part_number" className="text-white">Артикул</Label>
+          <Input
+            id="part_number"
+            value={formData.part_number}
+            onChange={(e) => setFormData({...formData, part_number: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+            required
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="description" className="text-white">Описание</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          className="bg-gray-700 border-gray-600 text-white"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="brand" className="text-white">Бренд</Label>
+          <Input
+            id="brand"
+            value={formData.brand}
+            onChange={(e) => setFormData({...formData, brand: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="category" className="text-white">Категория</Label>
+          <Input
+            id="category"
+            value={formData.category}
+            onChange={(e) => setFormData({...formData, category: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="base_price" className="text-white">Цена (₽)</Label>
+          <Input
+            id="base_price"
+            type="number"
+            value={formData.base_price}
+            onChange={(e) => setFormData({...formData, base_price: e.target.value})}
+            className="bg-gray-700 border-gray-600 text-white"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="image_url" className="text-white">URL изображения</Label>
+        <Input
+          id="image_url"
+          value={formData.image_url}
+          onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+          className="bg-gray-700 border-gray-600 text-white"
+          placeholder="https://example.com/image.jpg"
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onClose}
+          className="border-gray-600 text-gray-300"
+        >
+          Отмена
+        </Button>
+        <Button 
+          type="submit" 
+          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <RotateCw className="h-4 w-4 animate-spin mr-2" />
+              Сохранение...
+            </>
+          ) : (
+            <>
+              {product ? 'Обновить' : 'Добавить'} товар
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
   );
 };
 

@@ -83,6 +83,32 @@ const ProductPage = () => {
     }
   };
 
+  const addSupplierOfferToCart = async (offer) => {
+    try {
+      const userId = getCurrentUserId();
+      
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: offer.product_id,
+          quantity: 1
+        })
+      });
+      
+      if (response.ok) {
+        alert(`Предложение от "${offer.supplier_name}" добавлено в корзину!`);
+      } else {
+        alert('Ошибка добавления в корзину');
+      }
+    } catch (error) {
+      console.error('Error adding supplier offer to cart:', error);
+      alert('Ошибка добавления в корзину');
+    }
+  };
+
   if (!product) {
     return (
       <Layout>

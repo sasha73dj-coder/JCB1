@@ -236,8 +236,11 @@ const AdminProducts = () => {
                       <td className="py-4 px-4">
                         <div>
                           <span className="text-white font-semibold">
-                            {product.base_price ? formatPrice(product.base_price) + ' ₽' : 'Не указана'}
+                            {product.price ? formatPrice(product.price) + ' ₽' : 'Не указана'}
                           </span>
+                          <div className="text-gray-400 text-xs">
+                            На складе: {product.stock_quantity || 0} шт
+                          </div>
                         </div>
                       </td>
                       <td className="py-4 px-4">

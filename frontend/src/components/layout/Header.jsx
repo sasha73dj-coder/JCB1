@@ -35,6 +35,11 @@ const Header = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   const mainNavItems = [
     { name: 'О компании', path: '/about' },
     { name: 'Новости', path: '/news' },

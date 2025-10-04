@@ -45,16 +45,35 @@ const ProductPage = () => {
     }
   };
 
-  const addToCart = () => {
+  const addToCart = async () => {
     if (!product) return;
     
-    setAddingToCart(true);
-    
-    setTimeout(() => {
-      cartStorage.addItem(product.id, quantity);
-      alert(`Товар "${product.name}" добавлен в корзину!`);
+    try {
+      setAddingToCart(true);
+      const userId = getCurrentUserId();
+      
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity: quantity
+        })
+      });
+      
+      if (response.ok) {
+        alert(`Товар "${product.name}" добавлен в корзину!`);
+      } else {
+        alert('Ошибка добавления в корзину');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Ошибка добавления в корзину');
+    } finally {
       setAddingToCart(false);
-    }, 500);
+    }
   };
 
   if (!product) {

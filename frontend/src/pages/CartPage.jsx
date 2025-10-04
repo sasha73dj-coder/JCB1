@@ -4,7 +4,6 @@ import Layout from '../components/layout/Layout';
 import { Trash2, Plus, Minus, ShoppingBag, RotateCw } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { cartStorage } from '../utils/storage';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);

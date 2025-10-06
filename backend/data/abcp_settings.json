@@ -1,8 +1,8 @@
 {
-  "id": "2d224c7d-ab49-48c7-a591-f86abf5060e0",
-  "username": "test_abcp_user",
-  "password": "test_abcp_password_123",
-  "host": "api.abcp.ru",
+  "id": "fdbdc8ed-7ef7-4ea0-902d-f7417fb82fed",
+  "username": "test_user",
+  "password": "test_pass",
+  "host": "demo.abcp.ru",
   "active": true,
-  "updated_at": "2025-10-06T11:32:21.444309"
+  "updated_at": "2025-10-06T11:33:56.604691"
 }

@@ -16,6 +16,8 @@ const ProductPage = () => {
   const [addingToCart, setAddingToCart] = useState(false);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [supplierOffers, setSupplierOffers] = useState([]);
+  const [loadingOffers, setLoadingOffers] = useState(false);
   
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   

@@ -212,10 +212,10 @@ const ProductPage = () => {
             <div className="space-y-6">
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
-                {product.tags.includes('новинка') && (
+                {product.tags && product.tags.includes('новинка') && (
                   <Badge className="bg-green-500 text-white">Новинка</Badge>
                 )}
-                {product.tags.includes('хит') && (
+                {product.tags && product.tags.includes('хит') && (
                   <Badge className="bg-red-500 text-white">Хит</Badge>
                 )}
                 {product.discount > 0 && (

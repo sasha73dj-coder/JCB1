@@ -426,6 +426,11 @@ async def get_product_offers(product_id: str):
             brand=product.get("brand")
         )
         
+        # Если ABCP не вернул предложения, используем мок-данные
+        if not offers:
+            logger.info("ABCP returned no offers, falling back to mock data")
+            return get_mock_supplier_offers(product)
+        
         return {"success": True, "data": offers}
         
     except Exception as e:

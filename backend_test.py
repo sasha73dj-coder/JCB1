@@ -669,7 +669,7 @@ class NEXXBackendTester:
     
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting NEXX E-Commerce Backend API Tests")
+        print("🚀 Starting NEXX E-Commerce Extended Backend API Tests")
         print(f"Testing against: {self.base_url}")
         print("=" * 60)
         
@@ -678,9 +678,19 @@ class NEXXBackendTester:
             print("❌ API Health Check failed - aborting tests")
             return False
         
+        # Test existing functionality
         self.test_supplier_crud()
         self.test_product_management()
         self.test_supplier_offers()
+        
+        # Test new extended functionality
+        self.test_payment_systems()
+        self.test_abcp_integration()
+        self.test_new_supplier_api()
+        self.test_site_settings()
+        self.test_analytics_dashboard()
+        
+        # Test error handling
         self.test_error_handling()
         
         # Cleanup

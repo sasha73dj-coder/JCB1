@@ -510,7 +510,7 @@ const ProductPage = () => {
                   <Card className="bg-gray-800 border-gray-700">
                     <CardContent className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(product.specifications).map(([key, value]) => (
+                        {product.specifications && Object.entries(product.specifications).map(([key, value]) => (
                           <div key={key} className="flex justify-between items-center py-2 border-b border-gray-700">
                             <span className="text-gray-400">{key}</span>
                             <span className="text-white">{value}</span>

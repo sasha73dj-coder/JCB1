@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXX - Профессиональный интернет-магазин запчастей JCB</title>
+    <meta name="description" content="Оригинальные запчасти JCB. Широкий ассортимент, быстрая доставка, гарантия качества.">
+    <meta name="keywords" content="запчасти JCB, оригинальные запчасти, спецтехника, экскаваторы">
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #f97316;
+            --primary-hover: #ea580c;
+            --secondary-color: #1f2937;
+            --accent-color: #374151;
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --background-primary: #111827;
+            --background-secondary: #1f2937;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+        }
+        
+        .gradient-bg { background: linear-gradient(135deg, var(--secondary-color) 0%, var(--background-primary) 100%); }
+        .text-primary { color: var(--primary-color); }
+        .bg-primary { background-color: var(--primary-color); }
+        .hover-primary:hover { background-color: var(--primary-hover); }
+        .card-hover:hover { transform: translateY(-2px); }
+        .sidebar-width { width: 280px; }
+        .main-content { margin-left: 280px; }
+        
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-input { 
+            width: 100%; 
+            padding: 0.75rem; 
+            background-color: var(--accent-color); 
+            border: 1px solid #4b5563; 
+            border-radius: 0.5rem; 
+            color: var(--text-primary);
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-color); }
+        
+        @media (max-width: 768px) {
+            .sidebar-width { width: 100%; height: auto; position: relative; }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="text-4xl font-bold text-primary mb-4">NEXX</div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <div class="mt-4 text-gray-400">Загрузка системы...</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="gradient-bg shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <!-- Top Bar -->
+            <div class="border-b border-gray-700 py-2">
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex space-x-4">
+                        <span><i class="fas fa-phone text-primary"></i> <span id="companyPhone">+7 (495) 123-45-67</span></span>
+                        <span><i class="fas fa-envelope text-primary"></i> <span id="companyEmail">info@nexx.ru</span></span>
+                    </div>
+                    <div class="flex space-x-4" id="authButtons">
+                        <button onclick="showAuthModal('login')" class="hover:text-primary transition-colors">Войти</button>
+                        <button onclick="showAuthModal('register')" class="hover:text-primary transition-colors">Регистрация</button>
+                    </div>
+                    <div class="hidden flex space-x-4" id="userMenu">
+                        <span>Привет, <span id="userName"></span>!</span>
+                        <button onclick="showProfile()" class="hover:text-primary transition-colors">
+                            <i class="fas fa-user mr-1"></i>Профиль
+                        </button>
+                        <button onclick="logout()" class="hover:text-primary transition-colors">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Выйти
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Header -->
+            <div class="py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-8">
+                        <h1 class="text-3xl font-bold text-primary" id="siteLogo">NEXX</h1>
+                        <nav class="hidden md:flex space-x-6" id="mainNavigation">
+                            <a href="#" onclick="showPage('home')" class="hover:text-primary transition-colors">Главная</a>
+                            <a href="#" onclick="showPage('catalog')" class="hover:text-primary transition-colors">Каталог</a>
+                            <a href="#" onclick="showPage('about')" class="hover:text-primary transition-colors">О компании</a>
+                            <a href="#" onclick="showPage('delivery')" class="hover:text-primary transition-colors">Доставка</a>
+                            <a href="#" onclick="showPage('contacts')" class="hover:text-primary transition-colors">Контакты</a>
+                        </nav>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Поиск товаров..." 
+                                   class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 w-64 focus:outline-none focus:border-primary"
+                                   onkeyup="handleSearch(event)">
+                            <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <div class="relative">
+                            <button onclick="showCart()" class="bg-primary hover-primary px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="ml-2">Корзина</span>
+                                <span id="cartCount" class="bg-red-500 text-white rounded-full px-2 py-1 text-xs ml-2">0</span>
+                            </button>
+                        </div>
+                        
+                        <div id="adminButton" class="hidden">
+                            <button onclick="showAdmin()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-cog"></i> Панель управления
+                            </button>
+                        </div>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button class="md:hidden text-gray-300 hover:text-white" onclick="toggleMobileMenu()">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-gray-800 shadow-lg">
+        <div class="px-4 py-2 space-y-2">
+            <a href="#" onclick="showPage('home')" class="block py-2 hover:text-primary transition-colors">Главная</a>
+            <a href="#" onclick="showPage('catalog')" class="block py-2 hover:text-primary transition-colors">Каталог</a>
+            <a href="#" onclick="showPage('about')" class="block py-2 hover:text-primary transition-colors">О компании</a>
+            <a href="#" onclick="showPage('delivery')" class="block py-2 hover:text-primary transition-colors">Доставка</a>
+            <a href="#" onclick="showPage('contacts')" class="block py-2 hover:text-primary transition-colors">Контакты</a>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="min-h-screen">
+        <!-- Regular Pages -->
+        <main id="regularPages">
+            <!-- Content will be loaded here -->
+        </main>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="hidden min-h-screen flex">
+            <!-- Admin Sidebar -->
+            <div class="sidebar-width bg-gray-800 shadow-lg">
+                <div class="p-6">
+                    <h2 class="text-xl font-bold text-primary mb-6">Панель управления</h2>
+                    
+                    <nav id="adminNavigation" class="space-y-2">
+                        <!-- Navigation will be loaded based on user role -->
+                    </nav>
+                    
+                    <div class="mt-8 pt-6 border-t border-gray-700">
+                        <button onclick="exitAdmin()" class="w-full text-left text-gray-400 hover:text-white transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>Вернуться в магазин
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Content -->
+            <div class="flex-1 main-content bg-gray-900">
+                <div class="p-6" id="adminContent">
+                    <!-- Admin content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Panel -->
+        <div id="profilePanel" class="hidden min-h-screen">
+            <!-- Profile content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-800 rounded-lg p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="authTitle" class="text-2xl font-bold">Вход в систему</h2>
+                    <button onclick="hideAuthModal()" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <!-- Auth Tabs -->
+                <div class="flex mb-6 bg-gray-700 rounded-lg p-1">
+                    <button id="loginTab" onclick="switchAuthTab('login')" 
+                            class="flex-1 py-2 px-4 rounded-md transition-colors bg-primary text-white">
+                        Вход
+                    </button>
+                    <button id="registerTab" onclick="switchAuthTab('register')" 
+                            class="flex-1 py-2 px-4 rounded-md transition-colors text-gray-300">
+                        Регистрация
+                    </button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="tab-content active" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email или телефон</label>
+                        <input type="text" name="login" required class="form-input" placeholder="example@email.ru или +7...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <div class="relative">
+                            <input type="password" name="password" required class="form-input pr-10" placeholder="Введите пароль">
+                            <button type="button" onclick="togglePassword(this)" class="absolute right-3 top-3 text-gray-400">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary hover-primary py-3 rounded-lg font-semibold transition-colors">
+                        Войти в систему
+                    </button>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="#" class="text-primary hover:underline">Забыли пароль?</a>
+                    </div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="tab-content" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">Тип профиля</label>
+                        <select name="profileType" class="form-input" onchange="toggleProfileFields(this.value)">
+                            <option value="individual">Физическое лицо</option>
+                            <option value="legal">Юридическое лицо</option>
+                        </select>
+                    </div>
+
+                    <!-- Individual Fields -->
+                    <div id="individualFields">
+                        <div class="form-group">
+                            <label class="form-label">ФИО</label>
+                            <input type="text" name="fullName" class="form-input" placeholder="Иванов Иван Иванович">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Дата рождения</label>
+                                <input type="date" name="birthDate" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Пол</label>
+                                <select name="gender" class="form-input">
+                                    <option value="">Не указан</option>
+                                    <option value="male">Мужской</option>
+                                    <option value="female">Женский</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legal Entity Fields -->
+                    <div id="legalFields" class="hidden">
+                        <div class="form-group">
+                            <label class="form-label">Название организации</label>
+                            <input type="text" name="companyName" class="form-input" placeholder="ООО 'Ромашка'">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">ИНН</label>
+                                <input type="text" name="inn" class="form-input" placeholder="1234567890">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">КПП</label>
+                                <input type="text" name="kpp" class="form-input" placeholder="123456789">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Юридический адрес</label>
+                            <input type="text" name="legalAddress" class="form-input" placeholder="г. Москва, ул. Примерная, д. 1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Контактное лицо</label>
+                            <input type="text" name="contactPerson" class="form-input" placeholder="Иванов Иван Иванович">
+                        </div>
+                    </div>
+
+                    <!-- Common Fields -->
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" required class="form-input" placeholder="example@email.ru">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Телефон</label>
+                        <input type="tel" name="phone" required class="form-input" placeholder="+7 (999) 123-45-67">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Адрес доставки</label>
+                        <textarea name="deliveryAddress" class="form-input" rows="2" placeholder="г. Москва, ул. Доставочная, д. 1, кв. 10"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <div class="relative">
+                            <input type="password" name="password" required class="form-input pr-10" placeholder="Минимум 6 символов">
+                            <button type="button" onclick="togglePassword(this)" class="absolute right-3 top-3 text-gray-400">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Подтверждение пароля</label>
+                        <input type="password" name="confirmPassword" required class="form-input" placeholder="Повторите пароль">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="agreeTerms" required class="mr-2">
+                            <span class="text-sm">Согласен с <a href="#" class="text-primary">условиями использования</a></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary hover-primary py-3 rounded-lg font-semibold transition-colors">
+                        Зарегистрироваться
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Scripts -->
+    <script src="store-data.js"></script>
+    <script src="auth-system.js"></script>
+    <script src="admin-system.js"></script>
+    <script src="profile-system.js"></script>
+    <script src="page-manager.js"></script>
+    <script src="main-app.js"></script>
+</body>
+</html>

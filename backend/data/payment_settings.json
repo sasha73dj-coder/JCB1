@@ -79,5 +79,32 @@
     "webhook_url": "https://example.com/webhook/tinkoff",
     "active": true,
     "created_at": "2025-10-06T11:33:56.564251"
+  },
+  {
+    "id": "2bb66f36-f966-4ca3-8c70-86b19b6cf64f",
+    "provider": "yoomoney",
+    "merchant_id": "test_shop_123",
+    "secret_key": "test_secret_key_456",
+    "webhook_url": "https://example.com/webhook",
+    "active": true,
+    "created_at": "2025-10-06T11:35:42.932279"
+  },
+  {
+    "id": "856bddbb-e48e-471c-8580-9a95a9754a58",
+    "provider": "sberbank",
+    "merchant_id": "sber_merchant_001",
+    "secret_key": "sber_secret_key_789",
+    "webhook_url": "https://example.com/webhook/sberbank",
+    "active": true,
+    "created_at": "2025-10-06T11:35:42.941025"
+  },
+  {
+    "id": "fedb9f3d-88f9-413d-90a5-dcf8ae3536f6",
+    "provider": "tinkoff",
+    "merchant_id": "tinkoff_terminal_001",
+    "secret_key": "tinkoff_secret_key_321",
+    "webhook_url": "https://example.com/webhook/tinkoff",
+    "active": true,
+    "created_at": "2025-10-06T11:35:42.946432"
   }
 ]

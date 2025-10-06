@@ -40,8 +40,20 @@ const AdminSidebar = ({ currentView, onViewChange }) => {
     {
       id: 'suppliers',
       name: 'Поставщики',
-      icon: <Palette className="h-5 w-5" />,
+      icon: <Truck className="h-5 w-5" />,
       badge: '3'
+    },
+    {
+      id: 'integrations',
+      name: 'Интеграции',
+      icon: <Link className="h-5 w-5" />,
+      badge: 'NEW'
+    },
+    {
+      id: 'payments',
+      name: 'Платежи',
+      icon: <CreditCard className="h-5 w-5" />,
+      badge: null
     },
     {
       id: 'api-integration',

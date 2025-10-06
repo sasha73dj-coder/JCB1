@@ -61,8 +61,8 @@ const ProductPage = () => {
       setLoadingOffers(true);
       const response = await fetch(`${BACKEND_URL}/api/products/${product.id}/offers`);
       if (response.ok) {
-        const data = await response.json();
-        setSupplierOffers(data.offers || []);
+        const result = await response.json();
+        setSupplierOffers(result.data || []);
       } else {
         console.error('Failed to load supplier offers');
         setSupplierOffers([]);

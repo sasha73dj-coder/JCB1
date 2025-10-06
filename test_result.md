@@ -231,6 +231,30 @@ backend:
           agent: "testing"
           comment: "✅ COMPREHENSIVE TESTING COMPLETED: Analytics dashboard API fully functional. GET /api/analytics/dashboard returns complete analytics structure with all required sections: orders (total, today, pending, completed), revenue (total, today, this_month), products (total, low_stock, out_of_stock), users (total, new_today, active). All analytics fields present and properly structured. Current stats: 0 orders, 0 revenue, 5 products, 1 user. Dashboard ready for admin interface integration."
 
+  - task: "Admin Integrations Interface"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/admin/AdminIntegrations.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED: Admin integrations interface fully functional. All 4 required tabs working: 'Поставщики' (displays existing suppliers), 'Настройка ABCP' (form accepts test data: demo_user/demo_pass/demo.abcp.ru, 'Настроить ABCP' button ready), 'Добавить поставщика' (complete form with API type selection, credentials, settings), 'Аналитика' (supplier statistics). Russian localization perfect. All forms accept test data correctly. Integration with backend APIs working."
+
+  - task: "Admin Payments Interface"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/admin/AdminPayments.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED: Admin payments interface fully functional. All 3 required tabs working: 'Платежные системы' (displays configured payment systems), 'Добавить систему' (form accepts YooMoney test data: provider=yoomoney, merchant_id=demo123, secret_key=demo_secret), 'Настройки' (general payment configuration). All forms functional, Russian localization perfect. Integration with backend payment APIs working correctly."
+
 frontend:
   - task: "Admin Suppliers Management Interface"
     implemented: true

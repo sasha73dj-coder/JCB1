@@ -11,6 +11,11 @@ USERS_FILE = f"{DATA_DIR}/users.json"
 ORDERS_FILE = f"{DATA_DIR}/orders.json"
 CART_FILE = f"{DATA_DIR}/cart.json"
 SETTINGS_FILE = f"{DATA_DIR}/settings.json"
+PAYMENTS_FILE = f"{DATA_DIR}/payments.json"
+SUPPLIERS_FILE = f"{DATA_DIR}/suppliers.json"
+PAYMENT_SETTINGS_FILE = f"{DATA_DIR}/payment_settings.json"
+ABCP_SETTINGS_FILE = f"{DATA_DIR}/abcp_settings.json"
+SITE_SETTINGS_FILE = f"{DATA_DIR}/site_settings.json"
 
 # Ensure data directory exists
 os.makedirs(DATA_DIR, exist_ok=True)

@@ -11,7 +11,10 @@ import {
   BarChart3,
   FileText,
   Image,
-  Palette
+  Palette,
+  CreditCard,
+  Link,
+  Truck
 } from 'lucide-react';
 
 const AdminSidebar = ({ currentView, onViewChange }) => {

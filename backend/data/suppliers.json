@@ -1,0 +1,17 @@
+[
+  {
+    "id": "a6f40005-e24d-4b9b-a0b2-b5b43f108c5d",
+    "name": "ООО АБЦП Поставщик",
+    "api_type": "abcp",
+    "api_credentials": {
+      "username": "abcp_supplier_user",
+      "password": "abcp_supplier_pass",
+      "host": "api.abcp.ru"
+    },
+    "markup_percentage": 15.0,
+    "delivery_days": 2,
+    "min_order_amount": 1000.0,
+    "active": true,
+    "created_at": "2025-10-06T11:20:05.537484"
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "24abe67e-f461-4ffa-9cf5-b72c5b6a040a",
+    "provider": "yoomoney",
+    "merchant_id": "123456789",
+    "secret_key": "test_secret_key_yoomoney_12345",
+    "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/yoomoney",
+    "active": true,
+    "created_at": "2025-10-06T11:20:05.360028"
+  },
+  {
+    "id": "8d784e85-d85a-42cb-81a2-76bd3c1af1c4",
+    "provider": "sberbank",
+    "merchant_id": "sber_merchant_001",
+    "secret_key": "test_secret_key_sberbank_67890",
+    "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/sberbank",
+    "active": true,
+    "created_at": "2025-10-06T11:20:05.364606"
+  },
+  {
+    "id": "ac627ef5-e377-46c7-a39c-34dda74dd75e",
+    "provider": "tinkoff",
+    "merchant_id": "tinkoff_terminal_001",
+    "secret_key": "test_secret_key_tinkoff_54321",
+    "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/tinkoff",
+    "active": false,
+    "created_at": "2025-10-06T11:20:05.369670"
+  }
+]

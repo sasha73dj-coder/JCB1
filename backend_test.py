@@ -264,31 +264,339 @@ class NEXXBackendTester:
             try:
                 response = self.session.get(f"{self.base_url}/products/{product_id}/offers")
                 if response.status_code == 200:
-                    offers = response.json()
-                    self.log_test("Get Product Offers", True, f"Retrieved {len(offers)} offers for product {product_id}")
-                    
-                    # Validate offer structure
-                    if offers:
-                        offer = offers[0]
-                        required_fields = ["supplier_id", "supplier_name", "wholesale_price", "client_price", 
-                                         "stock_quantity", "delivery_time_days", "supplier_rating"]
+                    offers_data = response.json()
+                    if offers_data.get("success") and offers_data.get("data"):
+                        offers = offers_data["data"]
+                        self.log_test("Get Product Offers", True, f"Retrieved {len(offers)} offers for product {product_id}")
                         
-                        missing_fields = [field for field in required_fields if field not in offer]
-                        if not missing_fields:
-                            self.log_test("Offer Data Structure", True, "All required fields present in offers")
+                        # Validate offer structure
+                        if offers:
+                            offer = offers[0]
+                            required_fields = ["supplier_id", "supplier_name", "wholesale_price", "client_price", 
+                                             "stock_quantity", "delivery_time_days", "supplier_rating"]
                             
-                            # Validate pricing logic (client_price should be higher than wholesale_price)
-                            if offer["client_price"] > offer["wholesale_price"]:
-                                self.log_test("Pricing Logic", True, "Client price correctly higher than wholesale price")
+                            missing_fields = [field for field in required_fields if field not in offer]
+                            if not missing_fields:
+                                self.log_test("Offer Data Structure", True, "All required fields present in offers")
+                                
+                                # Validate pricing logic (client_price should be higher than wholesale_price)
+                                if offer["client_price"] > offer["wholesale_price"]:
+                                    self.log_test("Pricing Logic", True, "Client price correctly higher than wholesale price")
+                                else:
+                                    self.log_test("Pricing Logic", False, "Client price not higher than wholesale price")
                             else:
-                                self.log_test("Pricing Logic", False, "Client price not higher than wholesale price")
-                        else:
-                            self.log_test("Offer Data Structure", False, f"Missing fields: {missing_fields}")
-                    
+                                self.log_test("Offer Data Structure", False, f"Missing fields: {missing_fields}")
+                    else:
+                        self.log_test("Get Product Offers", False, "Invalid response structure")
                 else:
                     self.log_test("Get Product Offers", False, f"Failed with status {response.status_code}: {response.text}")
             except Exception as e:
                 self.log_test("Get Product Offers", False, f"Exception: {str(e)}")
+        
+        return True
+    
+    def test_payment_systems(self):
+        """Test Payment Systems API"""
+        print("\n=== TESTING PAYMENT SYSTEMS API ===")
+        
+        # Test payment settings creation
+        payment_settings_data = [
+            {
+                "provider": "yoomoney",
+                "merchant_id": "123456789",
+                "secret_key": "test_secret_key_yoomoney_12345",
+                "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/yoomoney",
+                "active": True
+            },
+            {
+                "provider": "sberbank",
+                "merchant_id": "sber_merchant_001",
+                "secret_key": "test_secret_key_sberbank_67890",
+                "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/sberbank",
+                "active": True
+            },
+            {
+                "provider": "tinkoff",
+                "merchant_id": "tinkoff_terminal_001",
+                "secret_key": "test_secret_key_tinkoff_54321",
+                "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/tinkoff",
+                "active": False
+            }
+        ]
+        
+        # Create payment settings
+        for settings_data in payment_settings_data:
+            try:
+                response = self.session.post(f"{self.base_url}/payments/settings", json=settings_data)
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("success"):
+                        self.log_test("Create Payment Settings", True, f"Payment settings for {settings_data['provider']} created successfully")
+                    else:
+                        self.log_test("Create Payment Settings", False, f"Failed to create payment settings for {settings_data['provider']}")
+                else:
+                    self.log_test("Create Payment Settings", False, f"Failed with status {response.status_code}: {response.text}")
+            except Exception as e:
+                self.log_test("Create Payment Settings", False, f"Exception: {str(e)}")
+        
+        # Get payment settings
+        try:
+            response = self.session.get(f"{self.base_url}/payments/settings")
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    settings = result["data"]
+                    self.log_test("Get Payment Settings", True, f"Retrieved {len(settings)} payment settings")
+                    
+                    # Verify we have the expected providers
+                    providers = [s.get("provider") for s in settings]
+                    expected_providers = ["yoomoney", "sberbank", "tinkoff"]
+                    if all(provider in providers for provider in expected_providers):
+                        self.log_test("Payment Providers Validation", True, "All expected payment providers found")
+                    else:
+                        self.log_test("Payment Providers Validation", False, f"Missing providers. Found: {providers}")
+                else:
+                    self.log_test("Get Payment Settings", False, "Invalid response structure")
+            else:
+                self.log_test("Get Payment Settings", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Get Payment Settings", False, f"Exception: {str(e)}")
+        
+        # Test payment creation
+        payment_data = {
+            "order_id": str(uuid.uuid4()),
+            "amount": 15000.0,
+            "currency": "RUB",
+            "description": "Оплата заказа автозапчастей NEXX",
+            "return_url": "https://turnkey-shop.preview.emergentagent.com/payment/success",
+            "payment_method": "card"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/payments/create", json=payment_data)
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("payment_id"):
+                    self.log_test("Create Payment", True, f"Payment created with ID: {result['payment_id']}")
+                    if result.get("confirmation_url"):
+                        self.log_test("Payment Confirmation URL", True, "Payment confirmation URL generated")
+                    else:
+                        self.log_test("Payment Confirmation URL", False, "No confirmation URL in response")
+                else:
+                    self.log_test("Create Payment", False, "Invalid payment creation response")
+            else:
+                # Payment creation might fail due to missing YooMoney service - this is expected
+                self.log_test("Create Payment", False, f"Payment creation failed (expected if YooMoney not configured): {response.status_code}")
+        except Exception as e:
+            self.log_test("Create Payment", False, f"Exception (expected if YooMoney not configured): {str(e)}")
+        
+        return True
+    
+    def test_abcp_integration(self):
+        """Test ABCP Integration API"""
+        print("\n=== TESTING ABCP INTEGRATION API ===")
+        
+        # Test ABCP settings creation
+        abcp_settings = {
+            "username": "test_abcp_user",
+            "password": "test_abcp_password_123",
+            "host": "api.abcp.ru",
+            "active": True
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/suppliers/abcp/settings", json=abcp_settings)
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success"):
+                    self.log_test("Create ABCP Settings", True, "ABCP settings created successfully")
+                else:
+                    self.log_test("Create ABCP Settings", False, "Failed to create ABCP settings")
+            else:
+                self.log_test("Create ABCP Settings", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Create ABCP Settings", False, f"Exception: {str(e)}")
+        
+        # Test ABCP connection
+        try:
+            response = self.session.get(f"{self.base_url}/suppliers/abcp/test")
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success"):
+                    self.log_test("Test ABCP Connection", True, "ABCP connection test successful")
+                else:
+                    self.log_test("Test ABCP Connection", False, "ABCP connection test failed")
+            else:
+                # Connection test might fail if ABCP service not properly configured - this is expected
+                self.log_test("Test ABCP Connection", False, f"ABCP connection test failed (expected if not configured): {response.status_code}")
+        except Exception as e:
+            self.log_test("Test ABCP Connection", False, f"Exception (expected if ABCP not configured): {str(e)}")
+        
+        return True
+    
+    def test_new_supplier_api(self):
+        """Test New Supplier API endpoints"""
+        print("\n=== TESTING NEW SUPPLIER API ===")
+        
+        # Test creating supplier with new API structure
+        supplier_data = {
+            "name": "ООО АБЦП Поставщик",
+            "api_type": "abcp",
+            "api_credentials": {
+                "username": "abcp_supplier_user",
+                "password": "abcp_supplier_pass",
+                "host": "api.abcp.ru"
+            },
+            "markup_percentage": 15.0,
+            "delivery_days": 2,
+            "min_order_amount": 1000.0,
+            "active": True
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/suppliers", json=supplier_data)
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    supplier = result["data"]
+                    supplier_id = supplier.get("id")
+                    self.created_suppliers.append(supplier_id)
+                    self.log_test("Create New Supplier", True, f"New supplier created with ID: {supplier_id}")
+                    
+                    # Validate supplier data structure
+                    if (supplier.get("name") == supplier_data["name"] and 
+                        supplier.get("api_type") == supplier_data["api_type"] and
+                        supplier.get("markup_percentage") == supplier_data["markup_percentage"]):
+                        self.log_test("New Supplier Data Integrity", True, "All supplier fields saved correctly")
+                    else:
+                        self.log_test("New Supplier Data Integrity", False, "Some supplier fields not saved correctly")
+                else:
+                    self.log_test("Create New Supplier", False, "Invalid response structure")
+            else:
+                self.log_test("Create New Supplier", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Create New Supplier", False, f"Exception: {str(e)}")
+        
+        # Test getting suppliers with new API structure
+        try:
+            response = self.session.get(f"{self.base_url}/suppliers")
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    suppliers = result["data"]
+                    self.log_test("Get New Suppliers", True, f"Retrieved {len(suppliers)} suppliers")
+                else:
+                    self.log_test("Get New Suppliers", False, "Invalid response structure")
+            else:
+                self.log_test("Get New Suppliers", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Get New Suppliers", False, f"Exception: {str(e)}")
+        
+        return True
+    
+    def test_site_settings(self):
+        """Test Site Settings API"""
+        print("\n=== TESTING SITE SETTINGS API ===")
+        
+        # Test site settings update
+        site_settings = {
+            "company_name": "NEXX Автозапчасти",
+            "company_inn": "7701234567",
+            "company_address": "г. Москва, ул. Автозаводская, д. 123",
+            "company_phone": "+7 (495) 123-45-67",
+            "company_email": "info@nexx-auto.ru",
+            "logo_url": "https://nexx-auto.ru/logo.png",
+            "primary_color": "#1e40af",
+            "secondary_color": "#64748b",
+            "meta_title": "NEXX - Автозапчасти и комплектующие",
+            "meta_description": "Интернет-магазин автозапчастей NEXX. Широкий ассортимент качественных запчастей для всех марок автомобилей."
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/settings/site", json=site_settings)
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    settings = result["data"]
+                    self.log_test("Update Site Settings", True, f"Site settings updated for company: {settings.get('company_name')}")
+                    
+                    # Validate settings data
+                    if (settings.get("company_name") == site_settings["company_name"] and
+                        settings.get("company_inn") == site_settings["company_inn"] and
+                        settings.get("primary_color") == site_settings["primary_color"]):
+                        self.log_test("Site Settings Data Integrity", True, "All site settings saved correctly")
+                    else:
+                        self.log_test("Site Settings Data Integrity", False, "Some site settings not saved correctly")
+                else:
+                    self.log_test("Update Site Settings", False, "Invalid response structure")
+            else:
+                self.log_test("Update Site Settings", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Update Site Settings", False, f"Exception: {str(e)}")
+        
+        # Test getting site settings
+        try:
+            response = self.session.get(f"{self.base_url}/settings/site")
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    settings = result["data"]
+                    self.log_test("Get Site Settings", True, f"Retrieved site settings for: {settings.get('company_name', 'Unknown')}")
+                else:
+                    self.log_test("Get Site Settings", False, "Invalid response structure")
+            else:
+                self.log_test("Get Site Settings", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Get Site Settings", False, f"Exception: {str(e)}")
+        
+        return True
+    
+    def test_analytics_dashboard(self):
+        """Test Analytics Dashboard API"""
+        print("\n=== TESTING ANALYTICS DASHBOARD API ===")
+        
+        try:
+            response = self.session.get(f"{self.base_url}/analytics/dashboard")
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("data"):
+                    analytics = result["data"]
+                    self.log_test("Get Dashboard Analytics", True, "Analytics data retrieved successfully")
+                    
+                    # Validate analytics structure
+                    required_sections = ["orders", "revenue", "products", "users"]
+                    missing_sections = [section for section in required_sections if section not in analytics]
+                    
+                    if not missing_sections:
+                        self.log_test("Analytics Data Structure", True, "All required analytics sections present")
+                        
+                        # Validate each section has required fields
+                        orders = analytics.get("orders", {})
+                        if all(field in orders for field in ["total", "today", "pending", "completed"]):
+                            self.log_test("Orders Analytics", True, f"Orders analytics: {orders['total']} total orders")
+                        else:
+                            self.log_test("Orders Analytics", False, "Missing fields in orders analytics")
+                        
+                        products = analytics.get("products", {})
+                        if all(field in products for field in ["total", "low_stock", "out_of_stock"]):
+                            self.log_test("Products Analytics", True, f"Products analytics: {products['total']} total products")
+                        else:
+                            self.log_test("Products Analytics", False, "Missing fields in products analytics")
+                        
+                        users = analytics.get("users", {})
+                        if all(field in users for field in ["total", "new_today", "active"]):
+                            self.log_test("Users Analytics", True, f"Users analytics: {users['total']} total users")
+                        else:
+                            self.log_test("Users Analytics", False, "Missing fields in users analytics")
+                            
+                    else:
+                        self.log_test("Analytics Data Structure", False, f"Missing sections: {missing_sections}")
+                else:
+                    self.log_test("Get Dashboard Analytics", False, "Invalid response structure")
+            else:
+                self.log_test("Get Dashboard Analytics", False, f"Failed with status {response.status_code}: {response.text}")
+        except Exception as e:
+            self.log_test("Get Dashboard Analytics", False, f"Exception: {str(e)}")
         
         return True
     

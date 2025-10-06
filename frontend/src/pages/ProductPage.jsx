@@ -54,6 +54,27 @@ const ProductPage = () => {
     }
   };
 
+  const loadSupplierOffers = async () => {
+    if (!product) return;
+    
+    try {
+      setLoadingOffers(true);
+      const response = await fetch(`${BACKEND_URL}/api/products/${product.id}/offers`);
+      if (response.ok) {
+        const data = await response.json();
+        setSupplierOffers(data.offers || []);
+      } else {
+        console.error('Failed to load supplier offers');
+        setSupplierOffers([]);
+      }
+    } catch (error) {
+      console.error('Error loading supplier offers:', error);
+      setSupplierOffers([]);
+    } finally {
+      setLoadingOffers(false);
+    }
+  };
+
   const addToCart = async () => {
     if (!product) return;
     
@@ -82,6 +103,33 @@ const ProductPage = () => {
       alert('Ошибка добавления в корзину');
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const addSupplierOfferToCart = async (offer) => {
+    try {
+      const userId = getCurrentUserId();
+      
+      const response = await fetch(`${BACKEND_URL}/api/cart/${userId}/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity: 1,
+          supplier_offer: offer
+        })
+      });
+      
+      if (response.ok) {
+        alert(`Предложение от "${offer.supplier_name}" добавлено в корзину!`);
+      } else {
+        alert('Ошибка добавления в корзину');
+      }
+    } catch (error) {
+      console.error('Error adding supplier offer to cart:', error);
+      alert('Ошибка добавления в корзину');
     }
   };
 

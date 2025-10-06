@@ -306,6 +306,226 @@ def create_order(user_id: str, order_data: OrderCreate):
 def get_orders():
     return Database.get_orders()
 
+# Платежные системы
+@api_router.post("/payments/settings")
+def create_payment_settings(settings: PaymentSettings):
+    """Настройка платежной системы"""
+    payment_settings = Database.add_payment_settings(settings.dict())
+    return {"success": True, "data": payment_settings}
+
+@api_router.get("/payments/settings")
+def get_payment_settings():
+    """Получение настроек платежных систем"""
+    settings = Database.get_payment_settings()
+    return {"success": True, "data": settings}
+
+@api_router.post("/payments/create")
+async def create_payment(payment_data: PaymentCreate):
+    """Создание платежа"""
+    try:
+        from services.yoomoney_service import get_yoomoney_service
+        
+        yoomoney = get_yoomoney_service()
+        payment = await yoomoney.create_payment(
+            amount=payment_data.amount,
+            description=payment_data.description,
+            return_url=payment_data.return_url,
+            metadata={"order_id": payment_data.order_id}
+        )
+        
+        # Сохраняем платеж в базу данных
+        payment_record = {
+            "payment_id": payment.id,
+            "order_id": payment_data.order_id,
+            "amount": payment_data.amount,
+            "currency": payment_data.currency,
+            "status": payment.status,
+            "provider": "yoomoney",
+            "confirmation_url": payment.confirmation.get("confirmation_url") if payment.confirmation else None
+        }
+        
+        Database.add_payment(payment_record)
+        
+        return {
+            "success": True,
+            "payment_id": payment.id,
+            "confirmation_url": payment.confirmation.get("confirmation_url") if payment.confirmation else None
+        }
+        
+    except Exception as e:
+        logger.error(f"Payment creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/webhooks/yoomoney")
+async def yoomoney_webhook(request: dict):
+    """Webhook для уведомлений от YooMoney"""
+    try:
+        from services.yoomoney_service import get_yoomoney_service
+        
+        yoomoney = get_yoomoney_service()
+        success = await yoomoney.process_webhook(request)
+        
+        if success:
+            return {"status": "ok"}
+        else:
+            raise HTTPException(status_code=400, detail="Webhook processing failed")
+            
+    except Exception as e:
+        logger.error(f"Webhook processing error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Поставщики ABCP
+@api_router.post("/suppliers/abcp/settings")
+def create_abcp_settings(settings: ABCPSettings):
+    """Настройка интеграции с ABCP"""
+    from services.abcp_service import init_abcp_service
+    
+    # Инициализируем сервис ABCP
+    init_abcp_service(settings.username, settings.password, settings.host)
+    
+    # Сохраняем настройки
+    abcp_settings = Database.add_abcp_settings(settings.dict())
+    return {"success": True, "data": abcp_settings}
+
+@api_router.get("/suppliers/abcp/test")
+async def test_abcp_connection():
+    """Тестирование подключения к ABCP"""
+    try:
+        from services.abcp_service import get_abcp_service
+        
+        abcp = get_abcp_service()
+        if not abcp:
+            raise HTTPException(status_code=400, detail="ABCP service not configured")
+        
+        result = await abcp.test_connection()
+        return {"success": True, "data": result}
+        
+    except Exception as e:
+        logger.error(f"ABCP connection test error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/products/{product_id}/offers")
+async def get_product_offers(product_id: str):
+    """Получение предложений поставщиков для товара"""
+    try:
+        # Получаем товар
+        product = Database.get_product(product_id)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        from services.abcp_service import get_abcp_service
+        
+        abcp = get_abcp_service()
+        if not abcp:
+            # Возвращаем мок-данные если ABCP не настроен
+            return get_mock_supplier_offers(product)
+        
+        # Получаем реальные предложения от ABCP
+        offers = await abcp.get_product_offers(
+            part_number=product.get("part_number"),
+            brand=product.get("brand")
+        )
+        
+        return {"success": True, "data": offers}
+        
+    except Exception as e:
+        logger.error(f"Error getting product offers: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/suppliers")
+def create_supplier(supplier_data: SupplierCreate):
+    """Создание поставщика"""
+    supplier = Database.add_supplier(supplier_data.dict())
+    return {"success": True, "data": supplier}
+
+@api_router.get("/suppliers")
+def get_suppliers():
+    """Получение списка поставщиков"""
+    suppliers = Database.get_suppliers()
+    return {"success": True, "data": suppliers}
+
+# Настройки сайта
+@api_router.post("/settings/site")
+def update_site_settings(settings: SiteSettings):
+    """Обновление настроек сайта"""
+    site_settings = Database.update_site_settings(settings.dict())
+    return {"success": True, "data": site_settings}
+
+@api_router.get("/settings/site")
+def get_site_settings():
+    """Получение настроек сайта"""
+    settings = Database.get_site_settings()
+    return {"success": True, "data": settings}
+
+# Аналитика и статистика
+@api_router.get("/analytics/dashboard")
+def get_dashboard_analytics():
+    """Получение данных для дашборда"""
+    try:
+        analytics = {
+            "orders": {
+                "total": len(Database.get_orders()),
+                "today": 0,  # TODO: подсчет заказов за сегодня
+                "pending": 0,  # TODO: подсчет ожидающих заказов
+                "completed": 0  # TODO: подсчет выполненных заказов
+            },
+            "revenue": {
+                "total": 0,  # TODO: подсчет общей выручки
+                "today": 0,  # TODO: выручка за сегодня
+                "this_month": 0  # TODO: выручка за месяц
+            },
+            "products": {
+                "total": len(Database.get_products()),
+                "low_stock": 0,  # TODO: товары с низким остатком
+                "out_of_stock": 0  # TODO: товары без остатка
+            },
+            "users": {
+                "total": len(Database.get_users()),
+                "new_today": 0,  # TODO: новые пользователи за сегодня
+                "active": 0  # TODO: активные пользователи
+            }
+        }
+        
+        return {"success": True, "data": analytics}
+        
+    except Exception as e:
+        logger.error(f"Analytics error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+def get_mock_supplier_offers(product):
+    """Мок-данные для предложений поставщиков"""
+    return {
+        "success": True,
+        "data": [
+            {
+                "supplier_id": "mock_supplier_1",
+                "supplier_name": "Запчасти Плюс",
+                "brand": product.get("brand", "Unknown"),
+                "part_number": product.get("part_number", ""),
+                "description": product.get("description", ""),
+                "wholesale_price": product.get("price", 1000) * 0.8,
+                "client_price": product.get("price", 1000),
+                "stock_quantity": 5,
+                "delivery_time_days": 2,
+                "supplier_rating": 4.7,
+                "item_key": "mock_key_1"
+            },
+            {
+                "supplier_id": "mock_supplier_2",
+                "supplier_name": "АвтоДеталь",
+                "brand": product.get("brand", "Unknown"),
+                "part_number": product.get("part_number", ""),
+                "description": product.get("description", ""),
+                "wholesale_price": product.get("price", 1000) * 0.85,
+                "client_price": product.get("price", 1000) * 1.1,
+                "stock_quantity": 3,
+                "delivery_time_days": 3,
+                "supplier_rating": 4.5,
+                "item_key": "mock_key_2"
+            }
+        ]
+    }
+
 # Include API router
 app.include_router(api_router)
 

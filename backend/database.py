@@ -302,6 +302,105 @@ class Database:
         orders.append(order)
         save_json(ORDERS_FILE, orders)
         return order
+    
+    # Платежные системы
+    @staticmethod
+    def get_payment_settings():
+        return load_json(PAYMENT_SETTINGS_FILE, [])
+    
+    @staticmethod
+    def add_payment_settings(payment_data):
+        settings = Database.get_payment_settings()
+        payment_settings = {
+            "id": str(uuid.uuid4()),
+            **payment_data,
+            "created_at": datetime.now().isoformat()
+        }
+        settings.append(payment_settings)
+        save_json(PAYMENT_SETTINGS_FILE, settings)
+        return payment_settings
+    
+    @staticmethod
+    def get_payments():
+        return load_json(PAYMENTS_FILE, [])
+    
+    @staticmethod
+    def add_payment(payment_data):
+        payments = Database.get_payments()
+        payment = {
+            "id": str(uuid.uuid4()),
+            **payment_data,
+            "created_at": datetime.now().isoformat()
+        }
+        payments.append(payment)
+        save_json(PAYMENTS_FILE, payments)
+        return payment
+    
+    @staticmethod
+    def update_payment_status(payment_id, status):
+        payments = Database.get_payments()
+        for payment in payments:
+            if payment.get("payment_id") == payment_id:
+                payment["status"] = status
+                payment["updated_at"] = datetime.now().isoformat()
+                save_json(PAYMENTS_FILE, payments)
+                return payment
+        return None
+    
+    # Поставщики
+    @staticmethod
+    def get_suppliers():
+        return load_json(SUPPLIERS_FILE, [])
+    
+    @staticmethod
+    def add_supplier(supplier_data):
+        suppliers = Database.get_suppliers()
+        supplier = {
+            "id": str(uuid.uuid4()),
+            **supplier_data,
+            "created_at": datetime.now().isoformat()
+        }
+        suppliers.append(supplier)
+        save_json(SUPPLIERS_FILE, suppliers)
+        return supplier
+    
+    @staticmethod
+    def get_abcp_settings():
+        settings = load_json(ABCP_SETTINGS_FILE, {})
+        return settings
+    
+    @staticmethod
+    def add_abcp_settings(settings_data):
+        settings = {
+            "id": str(uuid.uuid4()),
+            **settings_data,
+            "updated_at": datetime.now().isoformat()
+        }
+        save_json(ABCP_SETTINGS_FILE, settings)
+        return settings
+    
+    # Настройки сайта
+    @staticmethod
+    def get_site_settings():
+        settings = load_json(SITE_SETTINGS_FILE, {
+            "company_name": "NEXX Auto Parts",
+            "company_phone": "+7 (495) 123-45-67",
+            "company_email": "info@nexx-auto.ru",
+            "logo_url": "/logo.png",
+            "primary_color": "#1e40af",
+            "secondary_color": "#64748b",
+            "meta_title": "NEXX - Автозапчасти онлайн",
+            "meta_description": "Широкий выбор автозапчастей с доставкой по России"
+        })
+        return settings
+    
+    @staticmethod
+    def update_site_settings(settings_data):
+        current_settings = Database.get_site_settings()
+        current_settings.update(settings_data)
+        current_settings["updated_at"] = datetime.now().isoformat()
+        save_json(SITE_SETTINGS_FILE, current_settings)
+        return current_settings
 
 # Initialize database on import
 init_database()

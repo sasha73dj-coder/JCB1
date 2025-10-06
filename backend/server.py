@@ -52,6 +52,11 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
     name: str
+    user_type: str = "retail"  # "retail" или "legal"
+    phone: Optional[str] = None
+    company_name: Optional[str] = None
+    inn: Optional[str] = None
+    address: Optional[str] = None
 
 class ProductCreate(BaseModel):
     name: str
@@ -83,6 +88,49 @@ class OrderCreate(BaseModel):
     user_phone: str
     delivery_address: str
     notes: Optional[str] = None
+
+# Новые модели для полноценного интернет-магазина
+class PaymentSettings(BaseModel):
+    provider: str  # yoomoney, sberbank, tinkoff
+    merchant_id: str
+    secret_key: str
+    webhook_url: Optional[str] = None
+    active: bool = True
+
+class PaymentCreate(BaseModel):
+    order_id: str
+    amount: float
+    currency: str = "RUB"
+    description: str
+    return_url: str
+    payment_method: str = "card"
+
+class ABCPSettings(BaseModel):
+    username: str
+    password: str
+    host: str = "api.abcp.ru"
+    active: bool = True
+
+class SupplierCreate(BaseModel):
+    name: str
+    api_type: str  # "abcp", "exist", "emex"
+    api_credentials: Dict[str, str]
+    markup_percentage: float = 10.0
+    delivery_days: int = 3
+    min_order_amount: float = 0
+    active: bool = True
+
+class SiteSettings(BaseModel):
+    company_name: str
+    company_inn: Optional[str] = None
+    company_address: Optional[str] = None
+    company_phone: Optional[str] = None
+    company_email: Optional[str] = None
+    logo_url: Optional[str] = None
+    primary_color: str = "#1e40af"
+    secondary_color: str = "#64748b"
+    meta_title: Optional[str] = None
+    meta_description: Optional[str] = None
 
 # Routes
 @api_router.get("/")

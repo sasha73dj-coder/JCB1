@@ -31,6 +31,13 @@ const ProductPage = () => {
     loadProduct();
   }, [slug]);
 
+  // Load supplier offers when product is loaded
+  useEffect(() => {
+    if (product) {
+      loadSupplierOffers();
+    }
+  }, [product]);
+
   const loadProduct = async () => {
     try {
       setLoading(true);

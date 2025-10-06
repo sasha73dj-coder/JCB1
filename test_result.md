@@ -215,7 +215,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Product Page Supplier Offers"
+    - "Payment Systems Integration"
+    - "ABCP.ru Real API Integration"
+    - "Admin CRM Functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

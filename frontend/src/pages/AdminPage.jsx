@@ -11,6 +11,8 @@ import AdminSuppliers from '../components/admin/AdminSuppliers';
 import AdminSupplierIntegration from '../components/admin/AdminSupplierIntegration';
 import AdminPayments from '../components/admin/AdminPayments';
 import AdminIntegrations from '../components/admin/AdminIntegrations';
+import AdminSMS from '../components/admin/AdminSMS';
+import AdminContent from '../components/admin/AdminContent';
 import { Shield } from 'lucide-react';
 
 const AdminPage = () => {

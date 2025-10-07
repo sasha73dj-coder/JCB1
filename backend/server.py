@@ -171,6 +171,113 @@ class SiteSettings(BaseModel):
     meta_title: Optional[str] = None
     meta_description: Optional[str] = None
 
+# SMS Authentication Models
+class SMSLoginRequest(BaseModel):
+    phone: str
+
+class SMSVerifyRequest(BaseModel):
+    phone: str
+    code: str
+
+class SMSSettingsRequest(BaseModel):
+    provider: str  # "smsc", "smsru", "unifone"
+    login: Optional[str] = None
+    password: Optional[str] = None
+    api_key: Optional[str] = None
+    sender: str = "NEXX"
+
+# Enhanced User Models
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: Optional[str] = None
+    phone: Optional[str] = None
+    name: str
+    user_type: str = "retail"  # "retail" или "legal" 
+    role: str = "user"  # "user", "manager", "admin"
+    # Для юридических лиц
+    company_name: Optional[str] = None
+    inn: Optional[str] = None
+    kpp: Optional[str] = None
+    ogrn: Optional[str] = None
+    legal_address: Optional[str] = None
+    postal_address: Optional[str] = None
+    # Для физических лиц
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    passport_series: Optional[str] = None
+    passport_number: Optional[str] = None
+    birth_date: Optional[str] = None
+    # Общие поля
+    active: bool = True
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    name: Optional[str] = None
+    user_type: Optional[str] = None
+    role: Optional[str] = None
+    company_name: Optional[str] = None
+    inn: Optional[str] = None
+    kpp: Optional[str] = None
+    ogrn: Optional[str] = None
+    legal_address: Optional[str] = None
+    postal_address: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    passport_series: Optional[str] = None
+    passport_number: Optional[str] = None
+    birth_date: Optional[str] = None
+    active: Optional[bool] = None
+
+# Content Management Models
+class PageCreate(BaseModel):
+    title: str
+    slug: str
+    content: str
+    meta_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    meta_keywords: Optional[str] = None
+    active: bool = True
+
+class PageUpdate(BaseModel):
+    title: Optional[str] = None
+    slug: Optional[str] = None
+    content: Optional[str] = None
+    meta_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    meta_keywords: Optional[str] = None
+    active: Optional[bool] = None
+
+# 1C Integration Models
+class OneCSettings(BaseModel):
+    server_url: str
+    database: str
+    username: str
+    password: str
+    sync_products: bool = True
+    sync_prices: bool = True
+    sync_orders: bool = True
+    active: bool = True
+
+class OneCSync(BaseModel):
+    sync_type: str  # "products", "prices", "orders", "all"
+    force: bool = False
+
+# SEO Settings Models
+class SEOSettings(BaseModel):
+    robots_txt: Optional[str] = None
+    sitemap_enabled: bool = True
+    google_analytics: Optional[str] = None
+    yandex_metrika: Optional[str] = None
+    google_search_console: Optional[str] = None
+    yandex_webmaster: Optional[str] = None
+    structured_data: bool = True
+    open_graph: bool = True
+
 # Routes
 @api_router.get("/")
 def root():

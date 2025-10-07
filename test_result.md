@@ -309,15 +309,18 @@ frontend:
 
   - task: "Enhanced User Management API"
     implemented: true
-    working: "NA" 
+    working: true
     file: "/app/backend/server.py, /app/backend/database.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "✅ Extended user management with full CRUD operations, role-based access (user/manager/admin), user types (retail/legal), comprehensive profiles for both individuals and companies. API endpoints: GET/POST/PUT/DELETE /api/admin/users with advanced filtering. Database methods for user operations by phone, email, ID. Support for passport data, company details (INN, KPP, OGRN)."
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED: Enhanced User Management API fully functional. Tested with exact test data from review request: POST /api/admin/users (created retail user 'Тестовый Пользователь' and legal entity 'ООО Тестовая Компания' with INN, KPP, OGRN), GET /api/admin/users with filtering (role=user, user_type=retail, search='test'), PUT /api/admin/users/{id} (user updates working), GET /api/admin/users/{id} (user retrieval by ID), DELETE /api/admin/users/{id} (user deletion). All CRUD operations working perfectly. Data integrity verified for both retail and legal entity users. Advanced filtering, search functionality, and validation all working correctly."
 
   - task: "Content Management API"
     implemented: true

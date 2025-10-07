@@ -617,11 +617,11 @@ class NEXXNewFeaturesTester:
         except Exception as e:
             self.log_test("Get SEO Settings", False, f"Exception: {str(e)}")
         
-        # Test robots.txt generation
+        # Test robots.txt generation (via API endpoint)
         try:
-            response = self.session.get(f"{self.base_url.replace('/api', '')}/robots.txt")
+            response = self.session.get(f"{self.base_url}/robots.txt")
             if response.status_code == 200:
-                robots_content = response.text
+                robots_content = response.text.strip('"').replace('\\n', '\n')
                 if "User-agent:" in robots_content and "Sitemap:" in robots_content:
                     self.log_test("Robots.txt Generation", True, "Robots.txt generated successfully")
                 else:
@@ -631,11 +631,11 @@ class NEXXNewFeaturesTester:
         except Exception as e:
             self.log_test("Robots.txt Generation", False, f"Exception: {str(e)}")
         
-        # Test sitemap.xml generation
+        # Test sitemap.xml generation (via API endpoint)
         try:
-            response = self.session.get(f"{self.base_url.replace('/api', '')}/sitemap.xml")
+            response = self.session.get(f"{self.base_url}/sitemap.xml")
             if response.status_code == 200:
-                sitemap_content = response.text
+                sitemap_content = response.text.strip('"').replace('\\n', '\n')
                 if "<?xml version=" in sitemap_content and "<urlset" in sitemap_content:
                     self.log_test("Sitemap.xml Generation", True, "Sitemap.xml generated successfully")
                 else:

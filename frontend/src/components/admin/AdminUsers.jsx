@@ -280,7 +280,6 @@ const AdminUsers = () => {
               Сбросить
             </Button>
           </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -294,7 +293,7 @@ const AdminUsers = () => {
                 <p className="text-2xl font-bold text-white">{users.length}</p>
               </div>
               <div className="p-3 bg-blue-500/20 rounded-lg">
-                <Shield className="h-6 w-6 text-blue-400" />
+                <Users className="h-6 w-6 text-blue-400" />
               </div>
             </div>
           </CardContent>
@@ -305,7 +304,7 @@ const AdminUsers = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Активные</p>
-                <p className="text-2xl font-bold text-white">{users.filter(u => u.status === 'Активный').length}</p>
+                <p className="text-2xl font-bold text-white">{users.filter(u => u.active).length}</p>
               </div>
               <div className="p-3 bg-green-500/20 rounded-lg">
                 <Shield className="h-6 w-6 text-green-400" />
@@ -318,11 +317,11 @@ const AdminUsers = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Клиенты</p>
-                <p className="text-2xl font-bold text-white">{users.filter(u => u.role === 'Клиент').length}</p>
+                <p className="text-gray-400 text-sm">Физ. лица</p>
+                <p className="text-2xl font-bold text-white">{users.filter(u => u.user_type === 'retail').length}</p>
               </div>
               <div className="p-3 bg-purple-500/20 rounded-lg">
-                <Shield className="h-6 w-6 text-purple-400" />
+                <User className="h-6 w-6 text-purple-400" />
               </div>
             </div>
           </CardContent>
@@ -332,11 +331,11 @@ const AdminUsers = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Администраторы</p>
-                <p className="text-2xl font-bold text-white">{users.filter(u => u.role === 'Администратор').length}</p>
+                <p className="text-gray-400 text-sm">Юр. лица</p>
+                <p className="text-2xl font-bold text-white">{users.filter(u => u.user_type === 'legal').length}</p>
               </div>
               <div className="p-3 bg-orange-500/20 rounded-lg">
-                <Shield className="h-6 w-6 text-orange-400" />
+                <Building className="h-6 w-6 text-orange-400" />
               </div>
             </div>
           </CardContent>
@@ -347,98 +346,133 @@ const AdminUsers = () => {
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <CardTitle className="text-white">
-            Список пользователей ({filteredUsers.length})
+            Список пользователей ({users.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="text-left text-gray-400 font-medium py-3 px-4">Пользователь</th>
-                  <th className="text-left text-gray-400 font-medium py-3 px-4">Роль</th>
-                  <th className="text-left text-gray-400 font-medium py-3 px-4">Статус</th>
-                  <th className="text-left text-gray-400 font-medium py-3 px-4">Заказы</th>
-                  <th className="text-left text-gray-400 font-medium py-3 px-4">Общая сумма</th>
-                  <th className="text-left text-gray-400 font-medium py-3 px-4">Последний вход</th>
-                  <th className="text-right text-gray-400 font-medium py-3 px-4">Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {user.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <div className="text-white font-medium">{user.name}</div>
-                          <div className="flex items-center text-gray-400 text-sm mt-1">
-                            <Mail className="h-3 w-3 mr-1" />
-                            {user.email}
-                          </div>
-                          <div className="flex items-center text-gray-400 text-sm">
-                            <Phone className="h-3 w-3 mr-1" />
-                            {user.phone}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <Badge className={getRoleColor(user.role)}>
-                        {user.role}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-4">
-                      <Badge className={getStatusColor(user.status)}>
-                        {user.status}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="text-white font-medium">{user.orders}</span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="text-white font-semibold">
-                        {user.totalSpent > 0 ? `${formatPrice(user.totalSpent)} ₽` : '—'}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="text-gray-300 text-sm">
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {user.lastLogin}
-                        </div>
-                        <div className="text-gray-400 text-xs mt-1">
-                          Рег.: {user.registered}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {filteredUsers.length === 0 && (
+          {loading ? (
             <div className="text-center py-8">
-              <Shield className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-white text-lg font-semibold mb-2">Пользователи не найдены</h3>
-              <p className="text-gray-400">Попробуйте изменить параметры поиска</p>
+              <p className="text-gray-400">Загрузка пользователей...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left text-gray-400 font-medium py-3 px-4">Пользователь</th>
+                    <th className="text-left text-gray-400 font-medium py-3 px-4">Тип</th>
+                    <th className="text-left text-gray-400 font-medium py-3 px-4">Роль</th>
+                    <th className="text-left text-gray-400 font-medium py-3 px-4">Статус</th>
+                    <th className="text-left text-gray-400 font-medium py-3 px-4">Создан</th>
+                    <th className="text-right text-gray-400 font-medium py-3 px-4">Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-semibold">
+                            {(user.name || user.username).split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">{user.name || user.username}</div>
+                            <div className="flex items-center text-gray-400 text-sm mt-1">
+                              <Mail className="h-3 w-3 mr-1" />
+                              {user.email}
+                            </div>
+                            {user.phone && (
+                              <div className="flex items-center text-gray-400 text-sm">
+                                <Phone className="h-3 w-3 mr-1" />
+                                {user.phone}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          {getUserTypeIcon(user.user_type)}
+                          <span className="text-white">
+                            {user.user_type === 'legal' ? 'Юр. лицо' : 'Физ. лицо'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge className={getRoleColor(user.role)}>
+                          {user.role === 'admin' ? 'Администратор' : 
+                           user.role === 'manager' ? 'Менеджер' : 'Пользователь'}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge className={getStatusColor(user.active)}>
+                          {user.active ? 'Активный' : 'Заблокирован'}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-gray-300 text-sm">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {user.created_at ? new Date(user.created_at).toLocaleDateString('ru-RU') : '—'}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-gray-400 hover:text-white"
+                            onClick={() => {
+                              setEditingUser(user);
+                              setIsEditModalOpen(true);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-400 hover:text-red-300"
+                            onClick={() => deleteUser(user.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {users.length === 0 && (
+                <div className="text-center py-8">
+                  <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-white text-lg font-semibold mb-2">Пользователи не найдены</h3>
+                  <p className="text-gray-400">Попробуйте изменить параметры поиска</p>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Edit User Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Редактирование пользователя</DialogTitle>
+          </DialogHeader>
+          {editingUser && (
+            <UserForm 
+              user={editingUser} 
+              setUser={setEditingUser} 
+              onSave={updateUser}
+              isEdit={true}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

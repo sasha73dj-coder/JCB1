@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 # Backend URL from environment
-BACKEND_URL = "https://turnkey-shop.preview.emergentagent.com/api"
+BACKEND_URL = "https://ecom-nexx.preview.emergentagent.com/api"
 
 class NEXXExtendedTester:
     def __init__(self):

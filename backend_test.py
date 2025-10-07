@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 # Backend URL from environment
-BACKEND_URL = "https://turnkey-shop.preview.emergentagent.com/api"
+BACKEND_URL = "https://ecom-nexx.preview.emergentagent.com/api"
 
 class NEXXBackendTester:
     def __init__(self):
@@ -305,21 +305,21 @@ class NEXXBackendTester:
                 "provider": "yoomoney",
                 "merchant_id": "123456789",
                 "secret_key": "test_secret_key_yoomoney_12345",
-                "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/yoomoney",
+                "webhook_url": "https://ecom-nexx.preview.emergentagent.com/api/webhooks/yoomoney",
                 "active": True
             },
             {
                 "provider": "sberbank",
                 "merchant_id": "sber_merchant_001",
                 "secret_key": "test_secret_key_sberbank_67890",
-                "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/sberbank",
+                "webhook_url": "https://ecom-nexx.preview.emergentagent.com/api/webhooks/sberbank",
                 "active": True
             },
             {
                 "provider": "tinkoff",
                 "merchant_id": "tinkoff_terminal_001",
                 "secret_key": "test_secret_key_tinkoff_54321",
-                "webhook_url": "https://turnkey-shop.preview.emergentagent.com/api/webhooks/tinkoff",
+                "webhook_url": "https://ecom-nexx.preview.emergentagent.com/api/webhooks/tinkoff",
                 "active": False
             }
         ]
@@ -368,7 +368,7 @@ class NEXXBackendTester:
             "amount": 15000.0,
             "currency": "RUB",
             "description": "Оплата заказа автозапчастей NEXX",
-            "return_url": "https://turnkey-shop.preview.emergentagent.com/payment/success",
+            "return_url": "https://ecom-nexx.preview.emergentagent.com/payment/success",
             "payment_method": "card"
         }
         

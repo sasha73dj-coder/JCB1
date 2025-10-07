@@ -1,0 +1,11 @@
+{
+  "server_url": "http://1c-server",
+  "database": "trade",
+  "username": "user1c",
+  "password": "pass1c",
+  "sync_products": true,
+  "sync_prices": true,
+  "sync_orders": true,
+  "active": true,
+  "updated_at": "2025-10-07T06:39:27.361749"
+}

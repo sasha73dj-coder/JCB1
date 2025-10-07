@@ -1,0 +1,11 @@
+{
+  "robots_txt": "User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: https://nexx.ru/sitemap.xml",
+  "sitemap_enabled": true,
+  "google_analytics": "GA-123456789-1",
+  "yandex_metrika": "12345678",
+  "google_search_console": "https://search.google.com/search-console",
+  "yandex_webmaster": "https://webmaster.yandex.ru",
+  "structured_data": true,
+  "open_graph": true,
+  "updated_at": "2025-10-07T06:39:27.510437"
+}

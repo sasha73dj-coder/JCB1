@@ -18,5 +18,15 @@
     "content_type": "image/jpeg",
     "size": 39,
     "uploaded_at": "2025-10-07T06:40:46.908861"
+  },
+  {
+    "id": "77f9ee04-6eeb-4113-8236-b03d3e5375fd",
+    "original_filename": "test.txt",
+    "filename": "93802275-aa12-4a35-90be-ba98a26c4b7f.txt",
+    "file_path": "/app/uploads/93802275-aa12-4a35-90be-ba98a26c4b7f.txt",
+    "url": "/uploads/93802275-aa12-4a35-90be-ba98a26c4b7f.txt",
+    "content_type": "text/plain",
+    "size": 34,
+    "uploaded_at": "2025-10-07T06:51:28.479842"
   }
 ]

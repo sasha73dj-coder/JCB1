@@ -1,11 +1,11 @@
 {
-  "robots_txt": "User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: https://nexx.ru/sitemap.xml",
+  "robots_txt": null,
   "sitemap_enabled": true,
-  "google_analytics": "GA-123456789-1",
-  "yandex_metrika": "12345678",
-  "google_search_console": "https://search.google.com/search-console",
-  "yandex_webmaster": "https://webmaster.yandex.ru",
+  "google_analytics": "G-TEST123456",
+  "yandex_metrika": "87654321",
+  "google_search_console": "google-site-verification=abc123",
+  "yandex_webmaster": "yandex-verification=def456",
   "structured_data": true,
   "open_graph": true,
-  "updated_at": "2025-10-07T06:40:46.995349"
+  "updated_at": "2025-10-07T06:51:28.562874"
 }

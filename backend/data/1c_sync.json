@@ -22,5 +22,17 @@
       "orders_sent": 5,
       "errors": []
     }
+  },
+  {
+    "sync_type": "all",
+    "status": "completed",
+    "started_at": "2025-10-07T06:51:28.549531",
+    "completed_at": "2025-10-07T06:51:28.549535",
+    "results": {
+      "products_synced": 150,
+      "prices_updated": 150,
+      "orders_sent": 5,
+      "errors": []
+    }
   }
 ]

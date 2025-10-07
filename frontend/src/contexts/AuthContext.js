@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authStorage } from '../utils/storage';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

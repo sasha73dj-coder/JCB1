@@ -14,7 +14,10 @@ import {
   Palette,
   CreditCard,
   Link,
-  Truck
+  Truck,
+  MessageSquare,
+  Database,
+  Search
 } from 'lucide-react';
 
 const AdminSidebar = ({ currentView, onViewChange }) => {

@@ -352,6 +352,30 @@ frontend:
           agent: "testing"
           comment: "✅ TESTED SUCCESSFULLY: API integration component accessible through admin panel. Connection testing functionality works correctly, returns proper mock responses with status and response time. Integration with supplier management interface seamless."
 
+  - task: "1C Integration API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py, /app/backend/database.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED: 1C Integration API fully functional. Tested with exact test data from review request: POST /api/admin/1c/settings (server_url: http://1c-server, database: trade, username: user1c, password masked), GET /api/admin/1c/settings (settings retrieval with password masking), POST /api/admin/1c/sync (synchronization with all sync types), GET /api/admin/1c/sync/history (sync history tracking). All endpoints working correctly. Mock synchronization returns realistic results (150 products synced, 150 prices updated, 5 orders sent). Settings persistence and password security implemented correctly."
+
+  - task: "SEO Settings API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py, /app/backend/database.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETED: SEO Settings API fully functional. Tested POST /api/admin/seo/settings (Google Analytics, Yandex Metrika, structured data settings), GET /api/admin/seo/settings (settings retrieval), GET /api/robots.txt (robots.txt generation with proper format), GET /api/sitemap.xml (sitemap.xml generation with product URLs). All SEO features working correctly. Settings persistence verified, robots.txt and sitemap.xml generation working with proper XML/text formatting. SEO configuration ready for production use."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"

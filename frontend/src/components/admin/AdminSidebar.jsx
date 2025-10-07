@@ -71,20 +71,38 @@ const AdminSidebar = ({ currentView, onViewChange }) => {
       badge: '567'
     },
     {
-      id: 'analytics',
-      name: 'Аналитика',
-      icon: <FileText className="h-5 w-5" />,
+      id: 'sms',
+      name: 'SMS настройки',
+      icon: <MessageSquare className="h-5 w-5" />,
       badge: null
     },
     {
       id: 'content',
       name: 'Контент',
-      icon: <Image className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5" />,
+      badge: null
+    },
+    {
+      id: 'analytics',
+      name: 'Аналитика',
+      icon: <BarChart3 className="h-5 w-5" />,
+      badge: null
+    },
+    {
+      id: '1c',
+      name: '1C интеграция',
+      icon: <Database className="h-5 w-5" />,
+      badge: 'NEW'
+    },
+    {
+      id: 'seo',
+      name: 'SEO настройки',
+      icon: <Search className="h-5 w-5" />,
       badge: null
     },
     {
       id: 'settings',
-      name: 'Настройки',
+      name: 'Настройки сайта',
       icon: <Settings className="h-5 w-5" />,
       badge: null
     }

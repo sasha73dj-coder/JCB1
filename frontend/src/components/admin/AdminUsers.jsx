@@ -477,4 +477,253 @@ const AdminUsers = () => {
   );
 };
 
+// User Form Component
+const UserForm = ({ user, setUser, onSave, isEdit = false }) => {
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="basic">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="basic">Основные данные</TabsTrigger>
+          <TabsTrigger value="personal">Персональные данные</TabsTrigger>
+          <TabsTrigger value="company">Данные организации</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="basic" className="space-y-4 mt-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Логин *</Label>
+              <Input
+                id="username"
+                value={user.username}
+                onChange={(e) => setUser({...user, username: e.target.value})}
+                placeholder="Логин пользователя"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={user.email}
+                onChange={(e) => setUser({...user, email: e.target.value})}
+                placeholder="email@example.com"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phone">Телефон</Label>
+              <Input
+                id="phone"
+                value={user.phone || ''}
+                onChange={(e) => setUser({...user, phone: e.target.value})}
+                placeholder="+7 (900) 123-45-67"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="name">Полное имя *</Label>
+              <Input
+                id="name"
+                value={user.name}
+                onChange={(e) => setUser({...user, name: e.target.value})}
+                placeholder="Иван Иванов"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="user_type">Тип пользователя</Label>
+              <Select
+                value={user.user_type}
+                onValueChange={(value) => setUser({...user, user_type: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="retail">Физическое лицо</SelectItem>
+                  <SelectItem value="legal">Юридическое лицо</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="role">Роль</Label>
+              <Select
+                value={user.role}
+                onValueChange={(value) => setUser({...user, role: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">Пользователь</SelectItem>
+                  <SelectItem value="manager">Менеджер</SelectItem>
+                  <SelectItem value="admin">Администратор</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {!isEdit && (
+            <div className="space-y-2">
+              <Label htmlFor="password">Пароль {!isEdit && '*'}</Label>
+              <Input
+                id="password"
+                type="password"
+                value={user.password || ''}
+                onChange={(e) => setUser({...user, password: e.target.value})}
+                placeholder="Пароль пользователя"
+                required={!isEdit}
+              />
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="personal" className="space-y-4 mt-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name">Имя</Label>
+              <Input
+                id="first_name"
+                value={user.first_name || ''}
+                onChange={(e) => setUser({...user, first_name: e.target.value})}
+                placeholder="Иван"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Фамилия</Label>
+              <Input
+                id="last_name"
+                value={user.last_name || ''}
+                onChange={(e) => setUser({...user, last_name: e.target.value})}
+                placeholder="Иванов"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="middle_name">Отчество</Label>
+              <Input
+                id="middle_name"
+                value={user.middle_name || ''}
+                onChange={(e) => setUser({...user, middle_name: e.target.value})}
+                placeholder="Иванович"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="birth_date">Дата рождения</Label>
+              <Input
+                id="birth_date"
+                type="date"
+                value={user.birth_date || ''}
+                onChange={(e) => setUser({...user, birth_date: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="passport_series">Серия паспорта</Label>
+              <Input
+                id="passport_series"
+                value={user.passport_series || ''}
+                onChange={(e) => setUser({...user, passport_series: e.target.value})}
+                placeholder="1234"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="passport_number">Номер паспорта</Label>
+              <Input
+                id="passport_number"
+                value={user.passport_number || ''}
+                onChange={(e) => setUser({...user, passport_number: e.target.value})}
+                placeholder="567890"
+              />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="company" className="space-y-4 mt-6">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="company_name">Название организации</Label>
+              <Input
+                id="company_name"
+                value={user.company_name || ''}
+                onChange={(e) => setUser({...user, company_name: e.target.value})}
+                placeholder="ООО «Рога и копыта»"
+              />
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="inn">ИНН</Label>
+                <Input
+                  id="inn"
+                  value={user.inn || ''}
+                  onChange={(e) => setUser({...user, inn: e.target.value})}
+                  placeholder="7719876543"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="kpp">КПП</Label>
+                <Input
+                  id="kpp"
+                  value={user.kpp || ''}
+                  onChange={(e) => setUser({...user, kpp: e.target.value})}
+                  placeholder="771901001"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="ogrn">ОГРН</Label>
+                <Input
+                  id="ogrn"
+                  value={user.ogrn || ''}
+                  onChange={(e) => setUser({...user, ogrn: e.target.value})}
+                  placeholder="1027739876543"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="legal_address">Юридический адрес</Label>
+              <Input
+                id="legal_address"
+                value={user.legal_address || ''}
+                onChange={(e) => setUser({...user, legal_address: e.target.value})}
+                placeholder="123456, г. Москва, ул. Примерная, д. 1"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="postal_address">Почтовый адрес</Label>
+              <Input
+                id="postal_address"
+                value={user.postal_address || ''}
+                onChange={(e) => setUser({...user, postal_address: e.target.value})}
+                placeholder="123456, г. Москва, ул. Примерная, д. 1"
+              />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <div className="flex justify-end gap-4 pt-4 border-t">
+        <Button variant="outline" onClick={() => {}}>
+          Отмена
+        </Button>
+        <Button onClick={onSave}>
+          {isEdit ? 'Сохранить изменения' : 'Создать пользователя'}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export default AdminUsers;

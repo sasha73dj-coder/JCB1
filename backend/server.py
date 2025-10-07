@@ -757,6 +757,350 @@ def get_mock_supplier_offers(product):
         ]
     }
 
+# Enhanced User Management Routes
+@api_router.get("/admin/users")
+def get_all_users(
+    role: Optional[str] = Query(None),
+    user_type: Optional[str] = Query(None),
+    active: Optional[bool] = Query(None),
+    search: Optional[str] = Query(None)
+):
+    """Получение всех пользователей с фильтрами"""
+    users = Database.get_users()
+    
+    # Применяем фильтры
+    if role:
+        users = [u for u in users if u.get("role") == role]
+    if user_type:
+        users = [u for u in users if u.get("user_type") == user_type]
+    if active is not None:
+        users = [u for u in users if u.get("active", True) == active]
+    if search:
+        search_lower = search.lower()
+        users = [u for u in users if 
+                search_lower in u.get("name", "").lower() or
+                search_lower in u.get("username", "").lower() or
+                search_lower in u.get("email", "").lower() or
+                search_lower in u.get("phone", "").lower()]
+    
+    # Убираем пароли из ответа
+    safe_users = []
+    for user in users:
+        safe_user = user.copy()
+        safe_user.pop("password_hash", None)
+        safe_users.append(safe_user)
+    
+    return {"success": True, "data": safe_users}
+
+@api_router.post("/admin/users")
+def create_user_admin(user_data: UserCreate):
+    """Создание пользователя через админку"""
+    # Проверяем уникальность
+    if Database.get_user_by_username(user_data.username):
+        raise HTTPException(status_code=400, detail="Пользователь с таким именем уже существует")
+    
+    if user_data.email and Database.get_user_by_email(user_data.email):
+        raise HTTPException(status_code=400, detail="Пользователь с таким email уже существует")
+    
+    if user_data.phone and Database.get_user_by_phone(user_data.phone):
+        raise HTTPException(status_code=400, detail="Пользователь с таким телефоном уже существует")
+    
+    # Создаем пользователя
+    user_dict = user_data.dict()
+    
+    # Хешируем пароль если есть
+    if user_data.password:
+        user_dict["password_hash"] = bcrypt.hashpw(user_data.password.encode(), bcrypt.gensalt()).decode()
+    
+    user_dict["created_at"] = datetime.now().isoformat()
+    user_dict.pop("password", None)  # Удаляем plain password
+    
+    user = Database.add_user(user_dict)
+    
+    # Убираем пароль из ответа
+    safe_user = user.copy()
+    safe_user.pop("password_hash", None)
+    
+    return {"success": True, "data": safe_user}
+
+@api_router.put("/admin/users/{user_id}")
+def update_user_admin(user_id: str, user_data: UserUpdate):
+    """Обновление пользователя"""
+    update_dict = user_data.dict(exclude_unset=True)
+    
+    # Если есть пароль, хешируем его
+    if "password" in update_dict and update_dict["password"]:
+        update_dict["password_hash"] = bcrypt.hashpw(update_dict["password"].encode(), bcrypt.gensalt()).decode()
+        update_dict.pop("password")
+    
+    update_dict["updated_at"] = datetime.now().isoformat()
+    
+    user = Database.update_user(user_id, update_dict)
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    # Убираем пароль из ответа
+    safe_user = user.copy()
+    safe_user.pop("password_hash", None)
+    
+    return {"success": True, "data": safe_user}
+
+@api_router.delete("/admin/users/{user_id}")
+def delete_user_admin(user_id: str):
+    """Удаление пользователя"""
+    success = Database.delete_user(user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    return {"success": True, "message": "Пользователь удален"}
+
+@api_router.get("/admin/users/{user_id}")
+def get_user_admin(user_id: str):
+    """Получение пользователя по ID"""
+    user = Database.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    # Убираем пароль из ответа
+    safe_user = user.copy()
+    safe_user.pop("password_hash", None)
+    
+    return {"success": True, "data": safe_user}
+
+# Content Management Routes
+@api_router.get("/pages")
+def get_pages(active: Optional[bool] = Query(None)):
+    """Получение всех страниц"""
+    pages = Database.get_pages()
+    
+    if active is not None:
+        pages = [p for p in pages if p.get("active", True) == active]
+    
+    return {"success": True, "data": pages}
+
+@api_router.get("/pages/{slug}")
+def get_page_by_slug(slug: str):
+    """Получение страницы по slug"""
+    page = Database.get_page_by_slug(slug)
+    if not page:
+        raise HTTPException(status_code=404, detail="Страница не найдена")
+    
+    return {"success": True, "data": page}
+
+@api_router.post("/admin/pages")
+def create_page(page_data: PageCreate):
+    """Создание страницы"""
+    # Проверяем уникальность slug
+    if Database.get_page_by_slug(page_data.slug):
+        raise HTTPException(status_code=400, detail="Страница с таким slug уже существует")
+    
+    page_dict = page_data.dict()
+    page_dict["created_at"] = datetime.now().isoformat()
+    
+    page = Database.add_page(page_dict)
+    return {"success": True, "data": page}
+
+@api_router.put("/admin/pages/{page_id}")
+def update_page(page_id: str, page_data: PageUpdate):
+    """Обновление страницы"""
+    update_dict = page_data.dict(exclude_unset=True)
+    update_dict["updated_at"] = datetime.now().isoformat()
+    
+    page = Database.update_page(page_id, update_dict)
+    if not page:
+        raise HTTPException(status_code=404, detail="Страница не найдена")
+    
+    return {"success": True, "data": page}
+
+@api_router.delete("/admin/pages/{page_id}")
+def delete_page(page_id: str):
+    """Удаление страницы"""
+    success = Database.delete_page(page_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Страница не найдена")
+    
+    return {"success": True, "message": "Страница удалена"}
+
+# Media Upload Route
+@api_router.post("/admin/media/upload")
+async def upload_media(file: UploadFile = File(...)):
+    """Загрузка медиафайлов"""
+    # Создаем директорию для загрузок если не существует
+    upload_dir = Path("/app/uploads")
+    upload_dir.mkdir(exist_ok=True)
+    
+    # Генерируем уникальное имя файла
+    file_extension = Path(file.filename).suffix
+    unique_filename = f"{uuid.uuid4()}{file_extension}"
+    file_path = upload_dir / unique_filename
+    
+    # Сохраняем файл
+    try:
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        # Сохраняем информацию о файле
+        file_info = {
+            "id": str(uuid.uuid4()),
+            "original_filename": file.filename,
+            "filename": unique_filename,
+            "file_path": str(file_path),
+            "url": f"/uploads/{unique_filename}",
+            "content_type": file.content_type,
+            "size": len(content),
+            "uploaded_at": datetime.now().isoformat()
+        }
+        
+        Database.add_media_file(file_info)
+        
+        return {
+            "success": True,
+            "data": file_info
+        }
+        
+    except Exception as e:
+        logger.error(f"File upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки файла: {str(e)}")
+
+@api_router.get("/admin/media")
+def get_media_files():
+    """Получение списка загруженных файлов"""
+    files = Database.get_media_files()
+    return {"success": True, "data": files}
+
+# 1C Integration Routes
+@api_router.post("/admin/1c/settings")
+def save_1c_settings(settings: OneCSettings):
+    """Сохранение настроек 1C"""
+    settings_dict = settings.dict()
+    settings_dict["updated_at"] = datetime.now().isoformat()
+    
+    Database.save_1c_settings(settings_dict)
+    
+    return {"success": True, "message": "Настройки 1C сохранены"}
+
+@api_router.get("/admin/1c/settings")
+def get_1c_settings():
+    """Получение настроек 1C"""
+    settings = Database.get_1c_settings()
+    if settings:
+        # Скрываем пароль
+        settings = settings.copy()
+        settings["password"] = "***"
+    
+    return {"success": True, "data": settings}
+
+@api_router.post("/admin/1c/sync")
+async def sync_1c(sync_request: OneCSync):
+    """Синхронизация с 1C"""
+    # Здесь будет реальная интеграция с 1C
+    # Пока мок-реализация
+    
+    sync_result = {
+        "sync_type": sync_request.sync_type,
+        "status": "completed",
+        "started_at": datetime.now().isoformat(),
+        "completed_at": datetime.now().isoformat(),
+        "results": {
+            "products_synced": 0,
+            "prices_updated": 0,
+            "orders_sent": 0,
+            "errors": []
+        }
+    }
+    
+    # Имитируем синхронизацию
+    if sync_request.sync_type in ["products", "all"]:
+        sync_result["results"]["products_synced"] = 150
+    
+    if sync_request.sync_type in ["prices", "all"]:
+        sync_result["results"]["prices_updated"] = 150
+    
+    if sync_request.sync_type in ["orders", "all"]:
+        sync_result["results"]["orders_sent"] = 5
+    
+    Database.save_1c_sync_log(sync_result)
+    
+    return {"success": True, "data": sync_result}
+
+@api_router.get("/admin/1c/sync/history")
+def get_1c_sync_history():
+    """История синхронизации 1C"""
+    history = Database.get_1c_sync_history()
+    return {"success": True, "data": history}
+
+# SEO Settings Routes
+@api_router.post("/admin/seo/settings")
+def save_seo_settings(settings: SEOSettings):
+    """Сохранение SEO настроек"""
+    settings_dict = settings.dict()
+    settings_dict["updated_at"] = datetime.now().isoformat()
+    
+    Database.save_seo_settings(settings_dict)
+    
+    return {"success": True, "message": "SEO настройки сохранены"}
+
+@api_router.get("/admin/seo/settings")
+def get_seo_settings():
+    """Получение SEO настроек"""
+    settings = Database.get_seo_settings()
+    return {"success": True, "data": settings}
+
+@api_router.get("/robots.txt")
+def get_robots_txt():
+    """Генерация robots.txt"""
+    seo_settings = Database.get_seo_settings()
+    
+    if seo_settings and seo_settings.get("robots_txt"):
+        return seo_settings["robots_txt"]
+    
+    # Дефолтный robots.txt
+    default_robots = """User-agent: *
+Allow: /
+
+Sitemap: /sitemap.xml"""
+    
+    return default_robots
+
+@api_router.get("/sitemap.xml")
+def get_sitemap():
+    """Генерация sitemap.xml"""
+    seo_settings = Database.get_seo_settings()
+    
+    if not seo_settings or not seo_settings.get("sitemap_enabled", True):
+        raise HTTPException(status_code=404, detail="Sitemap отключен")
+    
+    # Базовая генерация sitemap
+    pages = Database.get_pages()
+    products = Database.get_products()
+    
+    sitemap_urls = []
+    
+    # Добавляем основные страницы
+    sitemap_urls.append("https://nexx.ru/")
+    sitemap_urls.append("https://nexx.ru/catalog")
+    
+    # Добавляем страницы
+    for page in pages:
+        if page.get("active", True):
+            sitemap_urls.append(f"https://nexx.ru/{page['slug']}")
+    
+    # Добавляем товары
+    for product in products[:100]:  # Ограничиваем для примера
+        sitemap_urls.append(f"https://nexx.ru/product/{product['id']}")
+    
+    # Генерируем XML
+    sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    for url in sitemap_urls:
+        sitemap_xml += f'  <url><loc>{url}</loc></url>\n'
+    
+    sitemap_xml += '</urlset>'
+    
+    return sitemap_xml
+
 # Include API router
 app.include_router(api_router)
 

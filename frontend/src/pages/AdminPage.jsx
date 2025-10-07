@@ -38,6 +38,10 @@ const AdminPage = () => {
         return <AdminPayments />;
       case 'users':
         return <AdminUsers />;
+      case 'sms':
+        return <AdminSMS />;
+      case 'content':
+        return <AdminContent />;
       case 'settings':
         return <AdminSettings />;
       default:

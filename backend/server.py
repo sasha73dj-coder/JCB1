@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 try:
     from database import Database
+    from services.sms_service import sms_service
 except ImportError:
     # Создаем базовую заглушку если модуль не найден
     class Database:
@@ -44,6 +45,14 @@ except ImportError:
         @staticmethod
         def get_users():
             return []
+    
+    class MockSMSService:
+        def send_verification_code(self, phone):
+            return {"success": True, "phone": phone}
+        def verify_code(self, phone, code):
+            return {"success": True, "phone": phone}
+    
+    sms_service = MockSMSService()
 
 # Load environment
 ROOT_DIR = Path(__file__).parent

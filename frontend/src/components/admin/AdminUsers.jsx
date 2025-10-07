@@ -23,38 +23,40 @@ import {
 } from 'lucide-react';
 
 const AdminUsers = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Mock users data
-  const users = [
-    {
-      id: 1,
-      name: 'Иван Петров',
-      email: 'ivan.petrov@example.com',
-      phone: '+7 (900) 123-45-67',
-      role: 'Клиент',
-      status: 'Активный',
-      orders: 12,
-      totalSpent: 450000,
-      lastLogin: '2024-12-20 15:30',
-      registered: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'Мария Сидорова',
-      email: 'maria.sidorova@example.com',
-      phone: '+7 (911) 234-56-78',
-      role: 'Клиент',
-      status: 'Активный',
-      orders: 8,
-      totalSpent: 320000,
-      lastLogin: '2024-12-19 12:45',
-      registered: '2024-03-22'
-    },
-    {
-      id: 3,
-      name: 'Алексей Кузнецов',
-      email: 'alexey.kuznetsov@example.com',
+  const [roleFilter, setRoleFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [newUser, setNewUser] = useState({
+    username: '',
+    email: '',
+    phone: '',
+    password: '',
+    name: '',
+    user_type: 'retail',
+    role: 'user',
+    // Для юридических лиц
+    company_name: '',
+    inn: '',
+    kpp: '',
+    ogrn: '',
+    legal_address: '',
+    postal_address: '',
+    // Для физических лиц
+    first_name: '',
+    last_name: '',
+    middle_name: '',
+    passport_series: '',
+    passport_number: '',
+    birth_date: '',
+    active: true
+  });
+
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
       phone: '+7 (921) 345-67-89',
       role: 'Клиент',
       status: 'Заблокирован',

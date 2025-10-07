@@ -8,5 +8,15 @@
     "content_type": "image/jpeg",
     "size": 39,
     "uploaded_at": "2025-10-07T06:39:27.308131"
+  },
+  {
+    "id": "ac450a24-3fde-452b-a1f1-83ad67cc0ebd",
+    "original_filename": "test_image.jpg",
+    "filename": "15564112-ffd4-4560-9684-67fcdd2627fa.jpg",
+    "file_path": "/app/uploads/15564112-ffd4-4560-9684-67fcdd2627fa.jpg",
+    "url": "/uploads/15564112-ffd4-4560-9684-67fcdd2627fa.jpg",
+    "content_type": "image/jpeg",
+    "size": 39,
+    "uploaded_at": "2025-10-07T06:40:46.908861"
   }
 ]

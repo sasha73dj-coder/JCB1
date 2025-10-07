@@ -353,6 +353,86 @@ def register_user(register_data: RegisterRequest):
         "message": "Registration successful"
     }
 
+# SMS Authentication Routes
+@api_router.post("/auth/sms/send")
+async def send_sms_code(request: SMSLoginRequest):
+    """Отправка SMS кода для входа"""
+    result = await sms_service.send_verification_code(request.phone)
+    
+    if not result['success']:
+        raise HTTPException(status_code=400, detail=result.get('error', 'Failed to send SMS'))
+    
+    return {
+        "success": True,
+        "phone": result['phone'],
+        "provider": result.get('provider'),
+        "message": "SMS код отправлен"
+    }
+
+@api_router.post("/auth/sms/verify")
+def verify_sms_code(request: SMSVerifyRequest):
+    """Проверка SMS кода и вход/регистрация"""
+    result = sms_service.verify_code(request.phone, request.code)
+    
+    if not result['success']:
+        raise HTTPException(status_code=400, detail=result.get('error', 'Invalid SMS code'))
+    
+    phone = result['phone']
+    
+    # Проверяем, есть ли пользователь с таким номером
+    user = Database.get_user_by_phone(phone)
+    
+    if not user:
+        # Создаем нового пользователя
+        user_data = {
+            "username": phone,
+            "phone": phone,
+            "email": f"{phone}@temp.local",
+            "name": f"Пользователь {phone[-4:]}",
+            "user_type": "retail",
+            "role": "user",
+            "active": True,
+            "created_at": datetime.now().isoformat(),
+            "auth_method": "sms"
+        }
+        user = Database.add_user(user_data)
+        message = "Пользователь создан и авторизован"
+    else:
+        message = "Авторизация успешна"
+    
+    # Возвращаем данные пользователя
+    user_response = {
+        "id": user["id"],
+        "username": user.get("username", phone),
+        "phone": user.get("phone", phone),
+        "email": user.get("email", ""),
+        "name": user.get("name", ""),
+        "user_type": user.get("user_type", "retail"),
+        "role": user.get("role", "user")
+    }
+    
+    return {
+        "success": True,
+        "user": user_response,
+        "message": message,
+        "auth_method": "sms"
+    }
+
+@api_router.post("/admin/sms/settings")
+def update_sms_settings(settings: SMSSettingsRequest):
+    """Обновление настроек SMS провайдера"""
+    sms_service.update_settings(settings.dict())
+    
+    return {
+        "success": True,
+        "message": "Настройки SMS обновлены"
+    }
+
+@api_router.get("/admin/sms/settings")
+def get_sms_settings():
+    """Получение настроек SMS"""
+    return sms_service.get_settings()
+
 # Product Routes
 @api_router.post("/products")
 def create_product(product_data: ProductCreate):

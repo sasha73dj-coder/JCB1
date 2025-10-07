@@ -16,6 +16,11 @@ SUPPLIERS_FILE = f"{DATA_DIR}/suppliers.json"
 PAYMENT_SETTINGS_FILE = f"{DATA_DIR}/payment_settings.json"
 ABCP_SETTINGS_FILE = f"{DATA_DIR}/abcp_settings.json"
 SITE_SETTINGS_FILE = f"{DATA_DIR}/site_settings.json"
+PAGES_FILE = f"{DATA_DIR}/pages.json"
+MEDIA_FILE = f"{DATA_DIR}/media.json"
+ONEC_SETTINGS_FILE = f"{DATA_DIR}/1c_settings.json"
+ONEC_SYNC_FILE = f"{DATA_DIR}/1c_sync.json"
+SEO_SETTINGS_FILE = f"{DATA_DIR}/seo_settings.json"
 
 # Ensure data directory exists
 os.makedirs(DATA_DIR, exist_ok=True)

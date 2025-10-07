@@ -203,29 +203,83 @@ const AdminUsers = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Управление пользователями</h1>
-          <p className="text-gray-400">Всего пользователей: {users.length}</p>
+        <div className="flex items-center gap-4">
+          <div className="bg-blue-500/20 p-3 rounded-lg">
+            <Users className="w-8 h-8 text-blue-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white">Управление пользователями</h1>
+            <p className="text-gray-400">Всего пользователей: {users.length}</p>
+          </div>
         </div>
         
-        <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-          <UserPlus className="h-4 w-4 mr-2" />
-          Добавить пользователя
-        </Button>
+        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+              <UserPlus className="h-4 w-4 mr-2" />
+              Добавить пользователя
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Создание нового пользователя</DialogTitle>
+            </DialogHeader>
+            <UserForm user={newUser} setUser={setNewUser} onSave={createUser} />
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* Search */}
+      {/* Filters */}
       <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Поиск по имени, email или телефону..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-gray-700 border-gray-600 text-white pl-10"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Поиск пользователей..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-gray-700 border-gray-600 text-white pl-10"
+              />
+            </div>
+            
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectValue placeholder="Роль" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Все роли</SelectItem>
+                <SelectItem value="user">Пользователь</SelectItem>
+                <SelectItem value="manager">Менеджер</SelectItem>
+                <SelectItem value="admin">Администратор</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectValue placeholder="Тип" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Все типы</SelectItem>
+                <SelectItem value="retail">Физ. лицо</SelectItem>
+                <SelectItem value="legal">Юр. лицо</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button 
+              onClick={() => {
+                setSearchTerm('');
+                setRoleFilter('');
+                setTypeFilter('');
+              }}
+              variant="outline"
+              className="border-gray-600"
+            >
+              Сбросить
+            </Button>
+          </div>
           </div>
         </CardContent>
       </Card>

@@ -406,6 +406,163 @@ class Database:
         current_settings["updated_at"] = datetime.now().isoformat()
         save_json(SITE_SETTINGS_FILE, current_settings)
         return current_settings
+    
+    # Расширенные методы для пользователей
+    @staticmethod
+    def get_user_by_phone(phone):
+        """Получить пользователя по номеру телефона"""
+        users = Database.get_users()
+        for user in users:
+            if user.get("phone") == phone:
+                return user
+        return None
+    
+    @staticmethod
+    def get_user_by_email(email):
+        """Получить пользователя по email"""
+        users = Database.get_users()
+        for user in users:
+            if user.get("email") == email:
+                return user
+        return None
+    
+    @staticmethod
+    def get_user_by_id(user_id):
+        """Получить пользователя по ID"""
+        users = Database.get_users()
+        for user in users:
+            if user.get("id") == user_id:
+                return user
+        return None
+    
+    @staticmethod
+    def update_user(user_id, update_data):
+        """Обновить пользователя"""
+        users = Database.get_users()
+        for i, user in enumerate(users):
+            if user.get("id") == user_id:
+                users[i].update(update_data)
+                save_json(USERS_FILE, users)
+                return users[i]
+        return None
+    
+    @staticmethod
+    def delete_user(user_id):
+        """Удалить пользователя"""
+        users = Database.get_users()
+        for i, user in enumerate(users):
+            if user.get("id") == user_id:
+                users.pop(i)
+                save_json(USERS_FILE, users)
+                return True
+        return False
+    
+    # Управление страницами
+    @staticmethod
+    def get_pages():
+        """Получить все страницы"""
+        return load_json(PAGES_FILE, [])
+    
+    @staticmethod
+    def add_page(page_data):
+        """Добавить страницу"""
+        pages = Database.get_pages()
+        page = {
+            "id": str(uuid.uuid4()),
+            **page_data
+        }
+        pages.append(page)
+        save_json(PAGES_FILE, pages)
+        return page
+    
+    @staticmethod
+    def get_page_by_slug(slug):
+        """Получить страницу по slug"""
+        pages = Database.get_pages()
+        for page in pages:
+            if page.get("slug") == slug:
+                return page
+        return None
+    
+    @staticmethod
+    def update_page(page_id, update_data):
+        """Обновить страницу"""
+        pages = Database.get_pages()
+        for i, page in enumerate(pages):
+            if page.get("id") == page_id:
+                pages[i].update(update_data)
+                save_json(PAGES_FILE, pages)
+                return pages[i]
+        return None
+    
+    @staticmethod
+    def delete_page(page_id):
+        """Удалить страницу"""
+        pages = Database.get_pages()
+        for i, page in enumerate(pages):
+            if page.get("id") == page_id:
+                pages.pop(i)
+                save_json(PAGES_FILE, pages)
+                return True
+        return False
+    
+    # Управление медиафайлами
+    @staticmethod
+    def get_media_files():
+        """Получить все медиафайлы"""
+        return load_json(MEDIA_FILE, [])
+    
+    @staticmethod
+    def add_media_file(file_data):
+        """Добавить медиафайл"""
+        files = Database.get_media_files()
+        files.append(file_data)
+        save_json(MEDIA_FILE, files)
+        return file_data
+    
+    # 1C интеграция
+    @staticmethod
+    def get_1c_settings():
+        """Получить настройки 1C"""
+        return load_json(ONEC_SETTINGS_FILE, {})
+    
+    @staticmethod
+    def save_1c_settings(settings_data):
+        """Сохранить настройки 1C"""
+        save_json(ONEC_SETTINGS_FILE, settings_data)
+        return settings_data
+    
+    @staticmethod
+    def get_1c_sync_history():
+        """Получить историю синхронизации 1C"""
+        return load_json(ONEC_SYNC_FILE, [])
+    
+    @staticmethod
+    def save_1c_sync_log(sync_data):
+        """Сохранить лог синхронизации 1C"""
+        history = Database.get_1c_sync_history()
+        history.append(sync_data)
+        # Оставляем только последние 100 записей
+        if len(history) > 100:
+            history = history[-100:]
+        save_json(ONEC_SYNC_FILE, history)
+        return sync_data
+    
+    # SEO настройки
+    @staticmethod
+    def get_seo_settings():
+        """Получить SEO настройки"""
+        return load_json(SEO_SETTINGS_FILE, {
+            "sitemap_enabled": True,
+            "structured_data": True,
+            "open_graph": True
+        })
+    
+    @staticmethod
+    def save_seo_settings(settings_data):
+        """Сохранить SEO настройки"""
+        save_json(SEO_SETTINGS_FILE, settings_data)
+        return settings_data
 
 # Initialize database on import
 init_database()

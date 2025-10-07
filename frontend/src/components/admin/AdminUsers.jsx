@@ -57,71 +57,149 @@ const AdminUsers = () => {
   });
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
-      phone: '+7 (921) 345-67-89',
-      role: 'Клиент',
-      status: 'Заблокирован',
-      orders: 3,
-      totalSpent: 95000,
-      lastLogin: '2024-12-10 09:20',
-      registered: '2024-06-10'
-    },
-    {
-      id: 4,
-      name: 'Ольга Попова',
-      email: 'olga.popova@example.com',
-      phone: '+7 (931) 456-78-90',
-      role: 'Клиент',
-      status: 'Активный',
-      orders: 15,
-      totalSpent: 680000,
-      lastLogin: '2024-12-20 11:15',
-      registered: '2023-11-08'
-    },
-    {
-      id: 5,
-      name: 'Анна Администратор',
-      email: 'admin@nexx.ru',
-      phone: '+7 (495) 492-14-78',
-      role: 'Администратор',
-      status: 'Активный',
-      orders: 0,
-      totalSpent: 0,
-      lastLogin: '2024-12-20 16:00',
-      registered: '2023-01-01'
+
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (roleFilter) params.append('role', roleFilter);
+      if (typeFilter) params.append('user_type', typeFilter);
+      if (searchTerm) params.append('search', searchTerm);
+
+      const response = await fetch(`${backendUrl}/api/admin/users?${params}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setUsers(data.data);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки пользователей:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.phone.includes(searchTerm)
-  );
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('ru-RU').format(price);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Активный':
-        return 'bg-green-500/20 text-green-400';
-      case 'Заблокирован':
-        return 'bg-red-500/20 text-red-400';
-      default:
-        return 'bg-gray-500/20 text-gray-400';
+  const createUser = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/admin/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setUsers([...users, data.data]);
+        setIsAddModalOpen(false);
+        resetNewUser();
+        alert('Пользователь создан');
+      } else {
+        alert(`Ошибка: ${data.message || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Ошибка создания пользователя:', error);
+      alert('Ошибка создания пользователя');
     }
+  };
+
+  const updateUser = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/admin/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editingUser),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setUsers(users.map(u => u.id === editingUser.id ? data.data : u));
+        setIsEditModalOpen(false);
+        setEditingUser(null);
+        alert('Пользователь обновлен');
+      } else {
+        alert(`Ошибка: ${data.message || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Ошибка обновления пользователя:', error);
+      alert('Ошибка обновления пользователя');
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    if (!confirm('Удалить пользователя?')) return;
+
+    try {
+      const response = await fetch(`${backendUrl}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setUsers(users.filter(u => u.id !== userId));
+        alert('Пользователь удален');
+      } else {
+        alert(`Ошибка: ${data.message || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Ошибка удаления пользователя:', error);
+      alert('Ошибка удаления пользователя');
+    }
+  };
+
+  const resetNewUser = () => {
+    setNewUser({
+      username: '',
+      email: '',
+      phone: '',
+      password: '',
+      name: '',
+      user_type: 'retail',
+      role: 'user',
+      company_name: '',
+      inn: '',
+      kpp: '',
+      ogrn: '',
+      legal_address: '',
+      postal_address: '',
+      first_name: '',
+      last_name: '',
+      middle_name: '',
+      passport_series: '',
+      passport_number: '',
+      birth_date: '',
+      active: true
+    });
+  };
+
+  const getStatusColor = (active) => {
+    return active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400';
   };
 
   const getRoleColor = (role) => {
     switch (role) {
-      case 'Администратор':
+      case 'admin':
         return 'bg-orange-500/20 text-orange-400';
-      case 'Менеджер':
+      case 'manager':
         return 'bg-blue-500/20 text-blue-400';
       default:
         return 'bg-gray-500/20 text-gray-400';
     }
   };
+
+  const getUserTypeIcon = (userType) => {
+    return userType === 'legal' ? <Building className="w-4 h-4" /> : <User className="w-4 h-4" />;
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, [roleFilter, typeFilter, searchTerm]);
 
   return (
     <div className="space-y-6">
